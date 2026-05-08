@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -155,18 +156,18 @@ tbody td{padding:11px 14px;font-size:13px;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 @keyframes spin{to{transform:rotate(360deg);}}
 @media(max-width:768px){
-  .sidebar{display:none;}
-  .kpi-grid{grid-template-columns:1fr 1fr;}
-  .pl-grid,.tax-grid{grid-template-columns:1fr;}
-  .topbar{padding:12px 16px;}
-  .content{padding:16px;padding-bottom:calc(80px + var(--safe-bottom));}
-  .tax-hero,.bank-cta{flex-direction:column;align-items:flex-start;gap:10px;}
-  .topbar-co{display:none;}
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0;padding-bottom:calc(8px + var(--safe-bottom));z-index:30;}
-  .bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;color:var(--muted);font-size:10px;}
-  .bottom-nav-item.active{color:var(--accent);}
-  .bottom-nav-icon{font-size:20px;line-height:1;}
-  .form-row{grid-template-columns:1fr;gap:0;}
+  .sidebar{display:none;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .pl-grid,.tax-grid{grid-template-columns:1fr;}
+  .topbar{padding:12px 16px;}
+  .content{padding:16px;padding-bottom:calc(80px + var(--safe-bottom));}
+  .tax-hero,.bank-cta{flex-direction:column;align-items:flex-start;gap:10px;}
+  .topbar-co{display:none;}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0;padding-bottom:calc(8px + var(--safe-bottom));z-index:30;}
+  .bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;color:var(--muted);font-size:10px;}
+  .bottom-nav-item.active{color:var(--accent);}
+  .bottom-nav-icon{font-size:20px;line-height:1;}
+  .form-row{grid-template-columns:1fr;gap:0;}
 }
 @media(max-width:480px){.kpi-grid{gap:10px;}.kpi-value{font-size:20px;}.net-value{font-size:36px;}}
 </style>
@@ -203,287 +204,272 @@ document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(el=>el.classList.remove('open'));});
 
 // Supabase data
-async function loadCompanies(){const{data}=await sb.from('companies').select('*').order('created_at');companies=data||[];if(companies.length>0&&!activeId)activeId=companies[0].id;}
-async function loadTxns(cid){const{data}=await sb.from('transactions').select('*').eq('company_id',cid).order('date',{ascending:false});return(data||[]).map(t=>({id:t.id,type:t.type,date:t.date,amount:parseFloat(t.amount),desc:t.description,cat:t.category,notes:t.notes||'',plaidId:t.plaid_id||null}));}
-async function saveCo(c){const{data}=await sb.from('companies').upsert({id:c.id,user_id:currentUser.id,name:c.name,income_cats:c.income_cats||DEF_INC,expense_cats:c.expense_cats||DEF_EXP,plaid_connections:c.plaid_connections||[],last_sync:c.last_sync||null}).select().single();return data;}
-async function saveTxnDB(t,cid){await sb.from('transactions').insert({id:t.id,company_id:cid,user_id:currentUser.id,type:t.type,date:t.date,amount:t.amount,description:t.desc,category:t.cat,notes:t.notes||'',plaid_id:t.plaidId||null});}
-async function delTxnDB(id){await sb.from('transactions').delete().eq('id',id);}
-async function delCoDB(cid){await sb.from('transactions').delete().eq('company_id',cid);await sb.from('companies').delete().eq('id',cid);}
+async function loadCompanies(){const{data}=await sb.from(‘companies’).select(’*’).order(‘created_at’);companies=data||[];if(companies.length>0&&!activeId)activeId=companies[0].id;}
+async function loadTxns(cid){const{data}=await sb.from(‘transactions’).select(’*’).eq(‘company_id’,cid).order(‘date’,{ascending:false});return(data||[]).map(t=>({id:t.id,type:t.type,date:t.date,amount:parseFloat(t.amount),desc:t.description,cat:t.category,notes:t.notes||’’,plaidId:t.plaid_id||null}));}
+async function saveCo(c){const{data}=await sb.from(‘companies’).upsert({id:c.id,user_id:currentUser.id,name:c.name,income_cats:c.income_cats||DEF_INC,expense_cats:c.expense_cats||DEF_EXP,plaid_connections:c.plaid_connections||[],last_sync:c.last_sync||null}).select().single();return data;}
+async function saveTxnDB(t,cid){await sb.from(‘transactions’).insert({id:t.id,company_id:cid,user_id:currentUser.id,type:t.type,date:t.date,amount:t.amount,description:t.desc,category:t.cat,notes:t.notes||’’,plaid_id:t.plaidId||null});}
+async function delTxnDB(id){await sb.from(‘transactions’).delete().eq(‘id’,id);}
+async function delCoDB(cid){await sb.from(‘transactions’).delete().eq(‘company_id’,cid);await sb.from(‘companies’).delete().eq(‘id’,cid);}
 
 // Plaid
-async function api(ep,body){const r=await fetch('/api/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.error)throw new Error(d.error);return d;}
+async function api(ep,body){const r=await fetch(’/api/’+ep,{method:‘POST’,headers:{‘Content-Type’:‘application/json’},body:JSON.stringify(body)});const d=await r.json();if(d.error)throw new Error(d.error);return d;}
 async function connectBank(){
-  toast('Initializing...','info');
-  try{
-    const{link_token}=await api('create-link-token',{});
-    await new Promise((res,rej)=>{if(window.Plaid){res();return;}const s=document.createElement('script');s.src='https://cdn.plaid.com/link/v2/stable/link-initialize.js';s.onload=res;s.onerror=()=>rej(new Error('Failed to load Plaid'));document.head.appendChild(s);});
-    window.Plaid.create({token:link_token,
-      onSuccess:async(pt,meta)=>{
-        toast('Connecting...','info');
-        try{
-          const{access_token}=await api('exchange-token',{public_token:pt});
-          const{accounts}=await api('get-accounts',{access_token});
-          const inst=meta?.institution?.name||'Bank';
-          const conns=[...(co().plaid_connections||[]),{access_token,accounts,institutionName:inst}];
-          companies=companies.map(c=>c.id===activeId?{...c,plaid_connections:conns}:c);
-          await saveCo(co());
-          toast('Importing transactions...','info');
-          await syncConn({access_token,institutionName:inst});
-        }catch(e){toast('Error: '+e.message,'error');}
-      },
-      onExit:()=>{}
-    }).open();
-  }catch(e){toast('Could not connect: '+e.message,'error');}
+toast(‘Initializing…’,‘info’);
+try{
+const{link_token}=await api(‘create-link-token’,{});
+await new Promise((res,rej)=>{if(window.Plaid){res();return;}const s=document.createElement(‘script’);s.src=‘https://cdn.plaid.com/link/v2/stable/link-initialize.js’;s.onload=res;s.onerror=()=>rej(new Error(‘Failed to load Plaid’));document.head.appendChild(s);});
+window.Plaid.create({token:link_token,
+onSuccess:async(pt,meta)=>{
+toast(‘Connecting…’,‘info’);
+try{
+const{access_token}=await api(‘exchange-token’,{public_token:pt});
+const{accounts}=await api(‘get-accounts’,{access_token});
+const inst=meta?.institution?.name||‘Bank’;
+const conns=[…(co().plaid_connections||[]),{access_token,accounts,institutionName:inst}];
+companies=companies.map(c=>c.id===activeId?{…c,plaid_connections:conns}:c);
+await saveCo(co());
+toast(‘Importing transactions…’,‘info’);
+await syncConn({access_token,institutionName:inst});
+}catch(e){toast(’Error: ’+e.message,‘error’);}
+},
+onExit:()=>{}
+}).open();
+}catch(e){toast(‘Could not connect: ‘+e.message,‘error’);}
 }
 async function syncConn(conn){
-  try{
-    let cursor,added=[],hasMore=true;
-    while(hasMore){const body={access_token:conn.access_token};if(cursor)body.cursor=cursor;const d=await api('sync-transactions',body);added=added.concat(d.added||[]);hasMore=d.has_more;cursor=d.next_cursor;if(!hasMore)break;}
-    const existing=new Set((await loadTxns(activeId)).map(t=>t.plaidId).filter(Boolean));
-    const newT=added.filter(t=>!existing.has(t.transaction_id));
-    for(const t of newT){
-      const loc={id:uid(),type:t.amount>0?'expense':'income',date:t.date,amount:Math.abs(t.amount),desc:t.merchant_name||t.name||'Unknown',cat:t.amount>0?(t.personal_finance_category?.primary||'Other Expenses').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'Other Income',notes:'',plaidId:t.transaction_id};
-      await saveTxnDB(loc,activeId);
-    }
-    const now=new Date().toLocaleString();
-    companies=companies.map(c=>c.id===activeId?{...c,last_sync:now}:c);
-    await saveCo(co());
-    toast('Synced '+newT.length+' new transactions');
-    renderTab();
-  }catch(e){toast('Sync error: '+e.message,'error');}
+try{
+let cursor,added=[],hasMore=true;
+while(hasMore){const body={access_token:conn.access_token};if(cursor)body.cursor=cursor;const d=await api(‘sync-transactions’,body);added=added.concat(d.added||[]);hasMore=d.has_more;cursor=d.next_cursor;if(!hasMore)break;}
+const existing=new Set((await loadTxns(activeId)).map(t=>t.plaidId).filter(Boolean));
+const newT=added.filter(t=>!existing.has(t.transaction_id));
+for(const t of newT){
+const loc={id:uid(),type:t.amount>0?‘expense’:‘income’,date:t.date,amount:Math.abs(t.amount),desc:t.merchant_name||t.name||‘Unknown’,cat:t.amount>0?(t.personal_finance_category?.primary||‘Other Expenses’).replace(/*/g,’ ‘).replace(/\b\w/g,c=>c.toUpperCase()):‘Other Income’,notes:’’,plaidId:t.transaction_id};
+await saveTxnDB(loc,activeId);
+}
+const now=new Date().toLocaleString();
+companies=companies.map(c=>c.id===activeId?{…c,last_sync:now}:c);
+await saveCo(co());
+toast(‘Synced ‘+newT.length+’ new transactions’);
+renderTab();
+}catch(e){toast(’Sync error: ’+e.message,‘error’);}
 }
 async function syncAllBanks(){
-  if(syncingBank)return;syncingBank=true;renderTab();
-  toast('Syncing...','info');
-  for(const conn of co()?.plaid_connections||[])await syncConn(conn);
-  syncingBank=false;renderTab();
+if(syncingBank)return;syncingBank=true;renderTab();
+toast(‘Syncing…’,‘info’);
+for(const conn of co()?.plaid_connections||[])await syncConn(conn);
+syncingBank=false;renderTab();
 }
 async function disconnectBank(idx){
-  const conns=(co()?.plaid_connections||[]).filter((_,i)=>i!==idx);
-  companies=companies.map(c=>c.id===activeId?{...c,plaid_connections:conns}:c);
-  await saveCo(co());toast('Bank disconnected');renderTab();
+const conns=(co()?.plaid_connections||[]).filter((*,i)=>i!==idx);
+companies=companies.map(c=>c.id===activeId?{…c,plaid_connections:conns}:c);
+await saveCo(co());toast(‘Bank disconnected’);renderTab();
 }
 
 // Auth
 function renderAuth(){
-  document.getElementById('app').innerHTML=`
-    <div class="auth-screen"><div class="auth-card">
-      <div class="auth-logo">1099 Books</div>
-      <div class="auth-sub">Business Finance</div>
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
-        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
-      </div>
-      <div class="auth-msg auth-error" id="auth-error"></div>
-      <div class="auth-msg auth-success" id="auth-success"></div>
-      <div class="form-group"><label class="field-label">Email</label><input type="email" class="field" id="auth-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')handleAuth()"></div>
-      <div class="form-group"><label class="field-label">Password</label><input type="password" class="field" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleAuth()"></div>
-      <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="handleAuth()" id="auth-btn">Sign In</button>
-      <div style="text-align:center;margin-top:14px;"><button onclick="forgotPw()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Forgot password?</button></div>
-    </div></div>`;}
-function switchAuthTab(m){authMode=m;document.getElementById('tab-signin').classList.toggle('active',m==='signin');document.getElementById('tab-signup').classList.toggle('active',m==='signup');document.getElementById('auth-btn').textContent=m==='signin'?'Sign In':'Create Account';}
+document.getElementById(‘app’).innerHTML=` <div class="auth-screen"><div class="auth-card"> <div class="auth-logo">1099 Books</div> <div class="auth-sub">Business Finance</div> <div class="auth-tabs"> <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</button> <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button> </div> <div class="auth-msg auth-error" id="auth-error"></div> <div class="auth-msg auth-success" id="auth-success"></div> <div class="form-group"><label class="field-label">Email</label><input type="email" class="field" id="auth-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')handleAuth()"></div> <div class="form-group"><label class="field-label">Password</label><input type="password" class="field" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleAuth()"></div> <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="handleAuth()" id="auth-btn">Sign In</button> <div style="text-align:center;margin-top:14px;"><button onclick="forgotPw()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Forgot password?</button></div> </div></div>`;}
+function switchAuthTab(m){authMode=m;document.getElementById(‘tab-signin’).classList.toggle(‘active’,m===‘signin’);document.getElementById(‘tab-signup’).classList.toggle(‘active’,m===‘signup’);document.getElementById(‘auth-btn’).textContent=m===‘signin’?‘Sign In’:‘Create Account’;}
 async function handleAuth(){
-  const email=document.getElementById('auth-email').value.trim();
-  const pw=document.getElementById('auth-password').value;
-  const err=document.getElementById('auth-error');const suc=document.getElementById('auth-success');
-  err.classList.remove('show');suc.classList.remove('show');
-  if(!email||!pw){err.textContent='Please enter email and password.';err.classList.add('show');return;}
-  const btn=document.getElementById('auth-btn');btn.textContent='Loading...';btn.disabled=true;
-  try{
-    if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;currentUser=data.user;await initApp();}
-    else{const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;suc.textContent='Account created! Check your email to confirm, then sign in.';suc.classList.add('show');}
-  }catch(e){err.textContent=e.message;err.classList.add('show');}
-  btn.textContent=authMode==='signin'?'Sign In':'Create Account';btn.disabled=false;
+const email=document.getElementById(‘auth-email’).value.trim();
+const pw=document.getElementById(‘auth-password’).value;
+const err=document.getElementById(‘auth-error’);const suc=document.getElementById(‘auth-success’);
+err.classList.remove(‘show’);suc.classList.remove(‘show’);
+if(!email||!pw){err.textContent=‘Please enter email and password.’;err.classList.add(‘show’);return;}
+const btn=document.getElementById(‘auth-btn’);btn.textContent=‘Loading…’;btn.disabled=true;
+try{
+if(authMode===‘signin’){const{data,error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;currentUser=data.user;await initApp();}
+else{const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;suc.textContent=‘Account created! Check your email to confirm, then sign in.’;suc.classList.add(‘show’);}
+}catch(e){err.textContent=e.message;err.classList.add(‘show’);}
+btn.textContent=authMode===‘signin’?‘Sign In’:‘Create Account’;btn.disabled=false;
 }
 async function forgotPw(){
-  const email=document.getElementById('auth-email').value.trim();
-  if(!email){document.getElementById('auth-error').textContent='Enter your email first.';document.getElementById('auth-error').classList.add('show');return;}
-  const{error}=await sb.auth.resetPasswordForEmail(email);
-  if(error){document.getElementById('auth-error').textContent=error.message;document.getElementById('auth-error').classList.add('show');}
-  else{document.getElementById('auth-success').textContent='Password reset email sent!';document.getElementById('auth-success').classList.add('show');}
+const email=document.getElementById(‘auth-email’).value.trim();
+if(!email){document.getElementById(‘auth-error’).textContent=‘Enter your email first.’;document.getElementById(‘auth-error’).classList.add(‘show’);return;}
+const{error}=await sb.auth.resetPasswordForEmail(email);
+if(error){document.getElementById(‘auth-error’).textContent=error.message;document.getElementById(‘auth-error’).classList.add(‘show’);}
+else{document.getElementById(‘auth-success’).textContent=‘Password reset email sent!’;document.getElementById(‘auth-success’).classList.add(‘show’);}
 }
 async function signOut(){await sb.auth.signOut();currentUser=null;companies=[];activeId=null;renderAuth();}
 
 async function initApp(){
-  document.getElementById('app').innerHTML='<div class="loading"><div class="spinner"></div><div style="color:var(--muted);font-size:13px;">Loading your data...</div></div>';
-  await loadCompanies();currentTab='dashboard';render();
+document.getElementById(‘app’).innerHTML=’<div class="loading"><div class="spinner"></div><div style="color:var(--muted);font-size:13px;">Loading your data…</div></div>’;
+await loadCompanies();currentTab=‘dashboard’;render();
 }
 
 // Render
 function render(){if(!co()){renderPicker();return;}renderAppShell();}
 function renderPicker(){
-  document.getElementById('app').innerHTML=`<div class="picker"><div class="picker-inner">
-    <div style="font-family:'Playfair Display',serif;font-size:44px;letter-spacing:-2px;text-align:center;margin-bottom:6px;">1099 Books</div>
-    <div style="font-size:13px;color:var(--dim);text-align:center;margin-bottom:44px;">Select a company to continue</div>
-    ${companies.map((c,i)=>`<div class="co-card" onclick="selectCo('${c.id}')"><div class="co-avatar" style="background:${COLORS[i%COLORS.length]}22;border:1px solid ${COLORS[i%COLORS.length]}44;color:${COLORS[i%COLORS.length]};">${c.name[0].toUpperCase()}</div><div><div style="font-size:14px;font-weight:500;">${c.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${(c.plaid_connections||[]).length>0?'🏦 Bank linked':''}</div></div><div style="margin-left:auto;color:var(--muted);font-size:17px;">→</div></div>`).join('')}
-    <button class="add-co-btn" onclick="openAddCo()">+ Add New Company</button>
-    <div style="text-align:center;margin-top:20px;"><button onclick="signOut()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Sign out (${currentUser?.email||''})</button></div>
-  </div></div>`;}
+document.getElementById(‘app’).innerHTML=`<div class="picker"><div class="picker-inner"> <div style="font-family:'Playfair Display',serif;font-size:44px;letter-spacing:-2px;text-align:center;margin-bottom:6px;">1099 Books</div> <div style="font-size:13px;color:var(--dim);text-align:center;margin-bottom:44px;">Select a company to continue</div> ${companies.map((c,i)=>`<div class="co-card" onclick="selectCo('${c.id}')"><div class="co-avatar" style="background:${COLORS[i%COLORS.length]}22;border:1px solid ${COLORS[i%COLORS.length]}44;color:${COLORS[i%COLORS.length]};">${c.name[0].toUpperCase()}</div><div><div style="font-size:14px;font-weight:500;">${c.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${(c.plaid_connections||[]).length>0?‘🏦 Bank linked’:’’}</div></div><div style="margin-left:auto;color:var(--muted);font-size:17px;">→</div></div>`).join(’’)}
+<button class="add-co-btn" onclick="openAddCo()">+ Add New Company</button>
+<div style="text-align:center;margin-top:20px;"><button onclick="signOut()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Sign out (${currentUser?.email||’’})</button></div>
+
+  </div></div>`;}
 function renderAppShell(){
-  const c=co();
-  const nav=[{id:'dashboard',icon:'◈',label:'Dashboard'},{id:'transactions',icon:'≡',label:'Transactions'},{id:'pl',icon:'⊞',label:'P&L'},{id:'taxes',icon:'◇',label:'Tax Estimate'}];
-  const titles={dashboard:'Dashboard',transactions:'Transactions',pl:'P&L Statement',taxes:'Tax Estimate'};
-  document.getElementById('app').innerHTML=`<div class="app">
-    <aside class="sidebar">
-      <div class="logo-wrap"><div class="logo">1099 Books</div><div class="logo-sub">Business Finance</div></div>
-      <div class="co-wrap"><div class="co-label">Company</div>
-        <select class="co-select" onchange="selectCo(this.value)">${companies.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.name}</option>`).join('')}</select>
-        <button class="btn btn-ghost btn-sm btn-full" onclick="openAddCo()">+ Add Company</button>
-      </div>
-      <div class="nav-wrap"><div class="nav-lbl">Navigate</div>
-        ${nav.map(n=>`<div class="nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')">${n.icon} ${n.label}</div>`).join('')}
-      </div>
-      <div class="sidebar-bottom">
-        <div class="nav-item" onclick="openCatModal()">⚙ Manage Categories</div>
-        <div class="nav-item" onclick="openEditCo()">✎ Edit Company</div>
-        <div class="nav-item" onclick="openImport()">↑ Import CSV</div>
-        <div class="user-chip"><div class="user-avatar">${currentUser?.email?.[0]?.toUpperCase()||'?'}</div><div style="flex:1;min-width:0;font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${currentUser?.email||''}</div><button onclick="signOut()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 5px;">⇥</button></div>
-      </div>
-    </aside>
-    <div class="main">
-      <div class="topbar"><div><span class="topbar-title">${titles[currentTab]}</span><span class="topbar-co">${c.name}</span></div>
-        <div class="topbar-actions"><button class="btn btn-income btn-sm" onclick="openTxnModal('income')">+ Income</button><button class="btn btn-expense btn-sm" onclick="openTxnModal('expense')">+ Expense</button></div>
-      </div>
-      <div class="content" id="tab-content"><div class="loading" style="min-height:200px;"><div class="spinner"></div></div></div>
-    </div>
-    <nav class="bottom-nav">${nav.map(n=>`<div class="bottom-nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')"><span class="bottom-nav-icon">${n.icon}</span><span>${n.label}</span></div>`).join('')}</nav>
-  </div>`;
-  renderTab();
+  const c=co();
+  const nav=[{id:'dashboard',icon:'◈',label:'Dashboard'},{id:'transactions',icon:'≡',label:'Transactions'},{id:'pl',icon:'⊞',label:'P&L'},{id:'taxes',icon:'◇',label:'Tax Estimate'}];
+  const titles={dashboard:'Dashboard',transactions:'Transactions',pl:'P&L Statement',taxes:'Tax Estimate'};
+  document.getElementById('app').innerHTML=`<div class="app">
+    <aside class="sidebar">
+      <div class="logo-wrap"><div class="logo">1099 Books</div><div class="logo-sub">Business Finance</div></div>
+      <div class="co-wrap"><div class="co-label">Company</div>
+        <select class="co-select" onchange="selectCo(this.value)">${companies.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.name}</option>`).join('')}</select>
+        <button class="btn btn-ghost btn-sm btn-full" onclick="openAddCo()">+ Add Company</button>
+      </div>
+      <div class="nav-wrap"><div class="nav-lbl">Navigate</div>
+        ${nav.map(n=>`<div class="nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')">${n.icon} ${n.label}</div>`).join('')}
+      </div>
+      <div class="sidebar-bottom">
+        <div class="nav-item" onclick="openCatModal()">⚙ Manage Categories</div>
+        <div class="nav-item" onclick="openEditCo()">✎ Edit Company</div>
+        <div class="nav-item" onclick="openImport()">↑ Import CSV</div>
+        <div class="user-chip"><div class="user-avatar">${currentUser?.email?.[0]?.toUpperCase()||'?'}</div><div style="flex:1;min-width:0;font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${currentUser?.email||''}</div><button onclick="signOut()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 5px;">⇥</button></div>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="topbar"><div><span class="topbar-title">${titles[currentTab]}</span><span class="topbar-co">${c.name}</span></div>
+        <div class="topbar-actions"><button class="btn btn-income btn-sm" onclick="openTxnModal('income')">+ Income</button><button class="btn btn-expense btn-sm" onclick="openTxnModal('expense')">+ Expense</button></div>
+      </div>
+      <div class="content" id="tab-content"><div class="loading" style="min-height:200px;"><div class="spinner"></div></div></div>
+    </div>
+    <nav class="bottom-nav">${nav.map(n=>`<div class="bottom-nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')"><span class="bottom-nav-icon">${n.icon}</span><span>${n.label}</span></div>`).join('')}</nav>
+  </div>`;
+  renderTab();
 }
 async function renderTab(){
-  const el=document.getElementById('tab-content');if(!el||!co())return;
-  const txns=await loadTxns(activeId);
-  if(currentTab==='dashboard')el.innerHTML=rDash(co(),txns);
-  else if(currentTab==='transactions')el.innerHTML=rTxns(co(),txns);
-  else if(currentTab==='pl')el.innerHTML=rPL(co(),txns);
-  else if(currentTab==='taxes')el.innerHTML=rTax(co(),txns);
+  const el=document.getElementById('tab-content');if(!el||!co())return;
+  const txns=await loadTxns(activeId);
+  if(currentTab==='dashboard')el.innerHTML=rDash(co(),txns);
+  else if(currentTab==='transactions')el.innerHTML=rTxns(co(),txns);
+  else if(currentTab==='pl')el.innerHTML=rPL(co(),txns);
+  else if(currentTab==='taxes')el.innerHTML=rTax(co(),txns);
 }
 
 function rDash(c,txns){
-  const inc=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const exp=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const net=inc-exp,tax=Math.max(0,net*0.30);
-  const recent=[...txns].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
-  const catT={};txns.filter(t=>t.type==='expense').forEach(t=>{catT[t.cat]=(catT[t.cat]||0)+t.amount;});
-  const catS=Object.entries(catT).sort((a,b)=>b[1]-a[1]);const maxC=catS[0]?.[1]||1;
-  const conns=c.plaid_connections||[];
-  const bankS=conns.length>0?`<div class="bank-panel"><div class="bank-panel-hdr"><div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);">Connected Banks</div>${c.last_sync?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">Last synced: ${c.last_sync}</div>`:''}</div><button class="btn btn-blue btn-sm" onclick="syncAllBanks()" ${syncingBank?'disabled':''}>${syncingBank?'<span class="spin">⟳</span> Syncing...':'↻ Sync Now'}</button></div>${conns.map((cn,i)=>`<div class="bank-acct-row"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:18px;">🏦</span><div><div style="font-size:13px;">${cn.institutionName||'Bank'}</div><div style="font-size:11px;color:var(--muted);">${cn.accounts?.length||0} account(s)</div></div></div><button onclick="disconnectBank(${i})" class="btn btn-ghost btn-sm">Disconnect</button></div>`).join('')}</div>`:`<div class="bank-cta"><div><div style="font-size:14px;font-weight:500;margin-bottom:3px;">Connect your bank to auto-import transactions</div><div style="font-size:12px;color:var(--muted);">Securely link via Plaid</div></div><button class="btn btn-blue btn-sm" onclick="connectBank()">🏦 Connect Bank</button></div>`;
-  const rows=recent.length===0?`<tr><td colspan="5"><div class="empty">No transactions yet. Connect a bank or add manually above.</div></td></tr>`:recent.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}</td><td><span class="cat-tag">${t.cat}</span></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td></tr>`).join('');
-  const bk=catS.length===0?'':`<div class="sec-lbl">Expense Breakdown</div><div class="table-wrap" style="padding:18px 20px;">${catS.map(([cat,val])=>`<div class="progress-wrap"><div class="progress-header"><span style="color:var(--dim)">${cat}</span><span class="mono" style="color:var(--muted)">${fmt(val)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${(val/maxC*100).toFixed(1)}%"></div></div></div>`).join('')}</div>`;
-  return `${bankS}<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Total Income</div><div class="kpi-value c-green">${fmt(inc)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='income').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Total Expenses</div><div class="kpi-value c-red">${fmt(exp)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='expense').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Net Profit</div><div class="kpi-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div><div class="kpi-sub">this year</div></div><div class="kpi-card"><div class="kpi-label">Est. Tax Owed</div><div class="kpi-value c-amber">${fmt(tax)}</div><div class="kpi-sub">~30% est. rate</div></div></div><div class="sec-lbl">Recent Transactions</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table></div>${bk}`;}
+const inc=txns.filter(t=>t.type===‘income’).reduce((s,t)=>s+t.amount,0);
+const exp=txns.filter(t=>t.type===‘expense’).reduce((s,t)=>s+t.amount,0);
+const net=inc-exp,tax=Math.max(0,net*0.30);
+const recent=[…txns].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+const catT={};txns.filter(t=>t.type===‘expense’).forEach(t=>{catT[t.cat]=(catT[t.cat]||0)+t.amount;});
+const catS=Object.entries(catT).sort((a,b)=>b[1]-a[1]);const maxC=catS[0]?.[1]||1;
+const conns=c.plaid_connections||[];
+const bankS=conns.length>0?`<div class="bank-panel"><div class="bank-panel-hdr"><div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);">Connected Banks</div>${c.last_sync?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">Last synced: ${c.last_sync}</div>`:''}</div><button class="btn btn-blue btn-sm" onclick="syncAllBanks()" ${syncingBank?'disabled':''}>${syncingBank?'<span class="spin">⟳</span> Syncing...':'↻ Sync Now'}</button></div>${conns.map((cn,i)=>`<div class="bank-acct-row"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:18px;">🏦</span><div><div style="font-size:13px;">${cn.institutionName||‘Bank’}</div><div style="font-size:11px;color:var(--muted);">${cn.accounts?.length||0} account(s)</div></div></div><button onclick="disconnectBank(${i})" class="btn btn-ghost btn-sm">Disconnect</button></div>`).join('')}</div>`:`<div class="bank-cta"><div><div style="font-size:14px;font-weight:500;margin-bottom:3px;">Connect your bank to auto-import transactions</div><div style="font-size:12px;color:var(--muted);">Securely link via Plaid</div></div><button class="btn btn-blue btn-sm" onclick="connectBank()">🏦 Connect Bank</button></div>`;
+const rows=recent.length===0?`<tr><td colspan="5"><div class="empty">No transactions yet. Connect a bank or add manually above.</div></td></tr>`:recent.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}</td><td><span class="cat-tag">${t.cat}</span></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td></tr>`).join(’’);
+const bk=catS.length===0?’’:`<div class="sec-lbl">Expense Breakdown</div><div class="table-wrap" style="padding:18px 20px;">${catS.map(([cat,val])=>`<div class="progress-wrap"><div class="progress-header"><span style="color:var(--dim)">${cat}</span><span class="mono" style="color:var(--muted)">${fmt(val)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${(val/maxC*100).toFixed(1)}%"></div></div></div>`).join('')}</div>`;
+return `${bankS}<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Total Income</div><div class="kpi-value c-green">${fmt(inc)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='income').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Total Expenses</div><div class="kpi-value c-red">${fmt(exp)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='expense').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Net Profit</div><div class="kpi-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div><div class="kpi-sub">this year</div></div><div class="kpi-card"><div class="kpi-label">Est. Tax Owed</div><div class="kpi-value c-amber">${fmt(tax)}</div><div class="kpi-sub">~30% est. rate</div></div></div><div class="sec-lbl">Recent Transactions</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table></div>${bk}`;}
 
 function rTxns(c,txns){
-  const cats=[...new Set(txns.map(t=>t.cat))].sort();
-  const months=[...new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const f=txns.filter(t=>{if(txnFilters.type&&t.type!==txnFilters.type)return false;if(txnFilters.cat&&t.cat!==txnFilters.cat)return false;if(txnFilters.month&&!t.date.startsWith(txnFilters.month))return false;if(txnFilters.search&&!t.desc.toLowerCase().includes(txnFilters.search.toLowerCase())&&!t.cat.toLowerCase().includes(txnFilters.search.toLowerCase()))return false;return true;});
-  const rows=f.length===0?`<tr><td colspan="6"><div class="empty">No transactions found.</div></td></tr>`:f.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${t.notes}</div>`:''}</td><td><span class="cat-tag">${t.cat}</span></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td><td><button class="del-btn" onclick="delTxn('${t.id}')">✕</button></td></tr>`).join('');
-  return `<div class="filter-bar"><input type="text" placeholder="Search..." value="${txnFilters.search}" oninput="txnFilters.search=this.value;renderTab()"><select onchange="txnFilters.type=this.value;renderTab()"><option value=""${!txnFilters.type?' selected':''}>All types</option><option value="income"${txnFilters.type==='income'?' selected':''}>Income</option><option value="expense"${txnFilters.type==='expense'?' selected':''}>Expense</option></select><select onchange="txnFilters.cat=this.value;renderTab()"><option value="">All categories</option>${cats.map(c=>`<option value="${c}"${txnFilters.cat===c?' selected':''}>${c}</option>`).join('')}</select><select onchange="txnFilters.month=this.value;renderTab()"><option value="">All months</option>${months.map(m=>`<option value="${m}"${txnFilters.month===m?' selected':''}>${m}</option>`).join('')}</select>${(txnFilters.search||txnFilters.type||txnFilters.cat||txnFilters.month)?`<button class="btn btn-ghost btn-sm" onclick="txnFilters={search:'',type:'',cat:'',month:''};renderTab()">Clear</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;}
+const cats=[…new Set(txns.map(t=>t.cat))].sort();
+const months=[…new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
+const f=txns.filter(t=>{if(txnFilters.type&&t.type!==txnFilters.type)return false;if(txnFilters.cat&&t.cat!==txnFilters.cat)return false;if(txnFilters.month&&!t.date.startsWith(txnFilters.month))return false;if(txnFilters.search&&!t.desc.toLowerCase().includes(txnFilters.search.toLowerCase())&&!t.cat.toLowerCase().includes(txnFilters.search.toLowerCase()))return false;return true;});
+const rows=f.length===0?`<tr><td colspan="6"><div class="empty">No transactions found.</div></td></tr>`:f.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${t.notes}</div>`:''}</td><td><span class="cat-tag">${t.cat}</span></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td><td><button class="del-btn" onclick="delTxn('${t.id}')">✕</button></td></tr>`).join(’’);
+return `<div class="filter-bar"><input type="text" placeholder="Search..." value="${txnFilters.search}" oninput="txnFilters.search=this.value;renderTab()"><select onchange="txnFilters.type=this.value;renderTab()"><option value=""${!txnFilters.type?' selected':''}>All types</option><option value="income"${txnFilters.type==='income'?' selected':''}>Income</option><option value="expense"${txnFilters.type==='expense'?' selected':''}>Expense</option></select><select onchange="txnFilters.cat=this.value;renderTab()"><option value="">All categories</option>${cats.map(c=>`<option value=”${c}”${txnFilters.cat===c?’ selected’:’’}>${c}</option>`).join('')}</select><select onchange="txnFilters.month=this.value;renderTab()"><option value="">All months</option>${months.map(m=>`<option value=”${m}”${txnFilters.month===m?’ selected’:’’}>${m}</option>`).join('')}</select>${(txnFilters.search||txnFilters.type||txnFilters.cat||txnFilters.month)?`<button class="btn btn-ghost btn-sm" onclick="txnFilters={search:'',type:'',cat:'',month:''};renderTab()">Clear</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;}
 
 function rPL(c,txns){
-  const months=[...new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const f=plMonth==='all'?txns:txns.filter(t=>t.date.startsWith(plMonth));
-  const inc=f.filter(t=>t.type==='income'),exp=f.filter(t=>t.type==='expense');
-  const iT={};inc.forEach(t=>iT[t.cat]=(iT[t.cat]||0)+t.amount);
-  const eT={};exp.forEach(t=>eT[t.cat]=(eT[t.cat]||0)+t.amount);
-  const tI=inc.reduce((s,t)=>s+t.amount,0),tE=exp.reduce((s,t)=>s+t.amount,0),net=tI-tE;
-  const pr=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
-  return `<div class="pl-months"><button class="month-btn${plMonth==='all'?' active':''}" onclick="plMonth='all';renderTab()">All Time</button>${months.map(m=>`<button class="month-btn${plMonth===m?' active':''}" onclick="plMonth='${m}';renderTab()">${m}</button>`).join('')}</div><div class="net-box"><div class="net-label">Net Profit / Loss</div><div class="net-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div></div><div class="pl-grid"><div class="pl-card"><div class="pl-card-hdr">Income</div>${Object.entries(iT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No income recorded</div>':Object.entries(iT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--green)')).join('')}<div class="pl-total"><span>Total Income</span><span class="mono c-green">${fmt(tI)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Expenses</div>${Object.entries(eT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No expenses recorded</div>':Object.entries(eT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--red)')).join('')}<div class="pl-total"><span>Total Expenses</span><span class="mono c-red">${fmt(tE)}</span></div></div></div>`;}
+const months=[…new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
+const f=plMonth===‘all’?txns:txns.filter(t=>t.date.startsWith(plMonth));
+const inc=f.filter(t=>t.type===‘income’),exp=f.filter(t=>t.type===‘expense’);
+const iT={};inc.forEach(t=>iT[t.cat]=(iT[t.cat]||0)+t.amount);
+const eT={};exp.forEach(t=>eT[t.cat]=(eT[t.cat]||0)+t.amount);
+const tI=inc.reduce((s,t)=>s+t.amount,0),tE=exp.reduce((s,t)=>s+t.amount,0),net=tI-tE;
+const pr=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
+return `<div class="pl-months"><button class="month-btn${plMonth==='all'?' active':''}" onclick="plMonth='all';renderTab()">All Time</button>${months.map(m=>`<button class="month-btn${plMonth===m?' active':''}" onclick="plMonth='${m}';renderTab()">${m}</button>`).join('')}</div><div class="net-box"><div class="net-label">Net Profit / Loss</div><div class="net-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div></div><div class="pl-grid"><div class="pl-card"><div class="pl-card-hdr">Income</div>${Object.entries(iT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No income recorded</div>':Object.entries(iT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--green)')).join('')}<div class="pl-total"><span>Total Income</span><span class="mono c-green">${fmt(tI)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Expenses</div>${Object.entries(eT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No expenses recorded</div>':Object.entries(eT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--red)')).join('')}<div class="pl-total"><span>Total Expenses</span><span class="mono c-red">${fmt(tE)}</span></div></div></div>`;}
 
 function rTax(c,txns){
-  const inc=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const exp=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const net=Math.max(0,inc-exp),se=net*0.153,fed=net*0.15,tot=se+fed;
-  const qI=[1,2,3,4].map(q=>{const r=[[1,3],[4,6],[7,9],[10,12]][q-1];return txns.filter(t=>{const m=parseInt(t.date.slice(5,7));return t.type==='income'&&m>=r[0]&&m<=r[1];}).reduce((s,t)=>s+t.amount,0);});
-  const rw=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
-  return `<div class="tax-hero"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:5px;">Estimated Tax Liability</div><div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--amber);">${fmt(tot)}</div><div style="font-size:11px;color:#A07820;margin-top:3px;">~30% self-employment effective rate</div></div><div style="text-align:right;"><div style="font-size:10px;color:#A07820;margin-bottom:4px;font-family:monospace;">Per Quarter</div><div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--amber);">${fmt(tot/4)}</div></div></div><div class="tax-grid"><div class="pl-card"><div class="pl-card-hdr">Tax Breakdown</div>${rw('Gross Income',inc,'var(--green)')}${rw('Deductible Expenses',exp,'var(--red)')}${rw('Net Taxable Income',net)}${rw('SE Tax (15.3%)',se)}${rw('Federal Tax (15%)',fed)}<div class="pl-total"><span>Total Estimated</span><span class="mono c-amber">${fmt(tot)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Quarterly Schedule</div>${[['Q1 (Jan–Mar)','Apr 15',0],['Q2 (Apr–Jun)','Jun 15',1],['Q3 (Jul–Sep)','Sep 15',2],['Q4 (Oct–Dec)','Jan 15',3]].map(([l,d,i])=>`<div class="pl-row" style="align-items:center;"><div><div style="color:var(--dim);">${l}</div><div style="font-size:11px;color:var(--muted);">Due ${d}</div></div><span class="mono c-amber">${fmt(qI[i]*0.30)}</span></div>`).join('')}</div></div><div class="pl-card"><div class="pl-card-hdr">Common 1099 Deductible Expenses</div>${[['🏢','401k Contributions','Up to $23k/yr employee'],['📊','Accounting Fees','CPA, bookkeeping, tax prep'],['📋','Licensing','Medical, state, DEA licenses'],['🍽️','Meals','50% deductible for business meals'],['💼','Payroll - Employer Taxes','FICA, FUTA, SUTA'],['💰','Payroll - Salary & Wages','Employees & contractors'],['🏠','Home Office','Dedicated workspace sq footage'],['🚗','Vehicle (Fuel)','67¢/mile standard 2024'],['🔧','Vehicle (Repairs & Maint.)','Actual expense method'],['🏥','Health Insurance','100% deductible self-employed']].map(([i,n,d])=>`<div class="pl-row"><span style="color:var(--dim);">${i} ${n}</span><span style="color:var(--muted);font-size:11px;">${d}</span></div>`).join('')}</div>`;}
+const inc=txns.filter(t=>t.type===‘income’).reduce((s,t)=>s+t.amount,0);
+const exp=txns.filter(t=>t.type===‘expense’).reduce((s,t)=>s+t.amount,0);
+const net=Math.max(0,inc-exp),se=net*0.153,fed=net*0.15,tot=se+fed;
+const qI=[1,2,3,4].map(q=>{const r=[[1,3],[4,6],[7,9],[10,12]][q-1];return txns.filter(t=>{const m=parseInt(t.date.slice(5,7));return t.type===‘income’&&m>=r[0]&&m<=r[1];}).reduce((s,t)=>s+t.amount,0);});
+const rw=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
+return `<div class="tax-hero"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:5px;">Estimated Tax Liability</div><div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--amber);">${fmt(tot)}</div><div style="font-size:11px;color:#A07820;margin-top:3px;">~30% self-employment effective rate</div></div><div style="text-align:right;"><div style="font-size:10px;color:#A07820;margin-bottom:4px;font-family:monospace;">Per Quarter</div><div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--amber);">${fmt(tot/4)}</div></div></div><div class="tax-grid"><div class="pl-card"><div class="pl-card-hdr">Tax Breakdown</div>${rw('Gross Income',inc,'var(--green)')}${rw('Deductible Expenses',exp,'var(--red)')}${rw('Net Taxable Income',net)}${rw('SE Tax (15.3%)',se)}${rw('Federal Tax (15%)',fed)}<div class="pl-total"><span>Total Estimated</span><span class="mono c-amber">${fmt(tot)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Quarterly Schedule</div>${[['Q1 (Jan–Mar)','Apr 15',0],['Q2 (Apr–Jun)','Jun 15',1],['Q3 (Jul–Sep)','Sep 15',2],['Q4 (Oct–Dec)','Jan 15',3]].map(([l,d,i])=>`<div class="pl-row" style="align-items:center;"><div><div style="color:var(--dim);">${l}</div><div style="font-size:11px;color:var(--muted);">Due ${d}</div></div><span class="mono c-amber">${fmt(qI[i]*0.30)}</span></div>`).join('')}</div></div><div class="pl-card"><div class="pl-card-hdr">Common 1099 Deductible Expenses</div>${[['🏢','401k Contributions','Up to $23k/yr employee'],['📊','Accounting Fees','CPA, bookkeeping, tax prep'],['📋','Licensing','Medical, state, DEA licenses'],['🍽️','Meals','50% deductible for business meals'],['💼','Payroll - Employer Taxes','FICA, FUTA, SUTA'],['💰','Payroll - Salary & Wages','Employees & contractors'],['🏠','Home Office','Dedicated workspace sq footage'],['🚗','Vehicle (Fuel)','67¢/mile standard 2024'],['🔧','Vehicle (Repairs & Maint.)','Actual expense method'],['🏥','Health Insurance','100% deductible self-employed']].map(([i,n,d])=>`<div class="pl-row"><span style="color:var(--dim);">${i} ${n}</span><span style="color:var(--muted);font-size:11px;">${d}</span></div>`).join('')}</div>`;}
 
 function switchTab(t){currentTab=t;renderAppShell();}
-function selectCo(id){activeId=id;currentTab='dashboard';txnFilters={search:'',type:'',cat:'',month:''};render();}
-function openAddCo(){document.getElementById('new-co-name').value='';openModal('add-co-overlay');setTimeout(()=>document.getElementById('new-co-name').focus(),100);}
+function selectCo(id){activeId=id;currentTab=‘dashboard’;txnFilters={search:’’,type:’’,cat:’’,month:’’};render();}
+function openAddCo(){document.getElementById(‘new-co-name’).value=’’;openModal(‘add-co-overlay’);setTimeout(()=>document.getElementById(‘new-co-name’).focus(),100);}
 async function addCompany(){
-  const name=document.getElementById('new-co-name').value.trim();if(!name)return;
-  const nc={id:uid(),name,income_cats:DEF_INC,expense_cats:DEF_EXP,plaid_connections:[],user_id:currentUser.id};
-  const saved=await saveCo(nc);if(saved){companies.push(saved);activeId=saved.id;}
-  closeModal('add-co-overlay');currentTab='dashboard';render();
+const name=document.getElementById(‘new-co-name’).value.trim();if(!name)return;
+const nc={id:uid(),name,income_cats:DEF_INC,expense_cats:DEF_EXP,plaid_connections:[],user_id:currentUser.id};
+const saved=await saveCo(nc);if(saved){companies.push(saved);activeId=saved.id;}
+closeModal(‘add-co-overlay’);currentTab=‘dashboard’;render();
 }
-function openEditCo(){document.getElementById('edit-co-name').value=co().name;openModal('edit-co-overlay');}
+function openEditCo(){document.getElementById(‘edit-co-name’).value=co().name;openModal(‘edit-co-overlay’);}
 async function saveEditCompany(){
-  const name=document.getElementById('edit-co-name').value.trim();if(!name)return;
-  companies=companies.map(c=>c.id===activeId?{...c,name}:c);await saveCo(co());closeModal('edit-co-overlay');render();
+const name=document.getElementById(‘edit-co-name’).value.trim();if(!name)return;
+companies=companies.map(c=>c.id===activeId?{…c,name}:c);await saveCo(co());closeModal(‘edit-co-overlay’);render();
 }
-function confirmDeleteCompany(){document.getElementById('del-co-msg').textContent=`Are you sure you want to delete "${co().name}"? All transactions will be permanently removed.`;closeModal('edit-co-overlay');openModal('del-co-overlay');}
-async function deleteCompany(){await delCoDB(activeId);companies=companies.filter(c=>c.id!==activeId);activeId=companies[0]?.id||null;closeModal('del-co-overlay');render();}
+function confirmDeleteCompany(){document.getElementById(‘del-co-msg’).textContent=`Are you sure you want to delete "${co().name}"? All transactions will be permanently removed.`;closeModal(‘edit-co-overlay’);openModal(‘del-co-overlay’);}
+async function deleteCompany(){await delCoDB(activeId);companies=companies.filter(c=>c.id!==activeId);activeId=companies[0]?.id||null;closeModal(‘del-co-overlay’);render();}
 function openTxnModal(type){
-  const c=co();
-  document.getElementById('txn-type').value=type;
-  document.getElementById('txn-modal-title').textContent=type==='income'?'Add Income':'Add Expense';
-  document.getElementById('txn-date').value=today();
-  document.getElementById('txn-amount').value='';
-  document.getElementById('txn-desc').value='';
-  document.getElementById('txn-notes').value='';
-  const cats=type==='income'?(c.income_cats||DEF_INC):(c.expense_cats||DEF_EXP);
-  document.getElementById('txn-cat').innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-  openModal('txn-overlay');setTimeout(()=>document.getElementById('txn-amount').focus(),100);
+const c=co();
+document.getElementById(‘txn-type’).value=type;
+document.getElementById(‘txn-modal-title’).textContent=type===‘income’?‘Add Income’:‘Add Expense’;
+document.getElementById(‘txn-date’).value=today();
+document.getElementById(‘txn-amount’).value=’’;
+document.getElementById(‘txn-desc’).value=’’;
+document.getElementById(‘txn-notes’).value=’’;
+const cats=type===‘income’?(c.income_cats||DEF_INC):(c.expense_cats||DEF_EXP);
+document.getElementById(‘txn-cat’).innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join(’’);
+openModal(‘txn-overlay’);setTimeout(()=>document.getElementById(‘txn-amount’).focus(),100);
 }
 async function saveTxn(){
-  const type=document.getElementById('txn-type').value;
-  const date=document.getElementById('txn-date').value;
-  const amount=parseFloat(document.getElementById('txn-amount').value);
-  const desc=document.getElementById('txn-desc').value.trim();
-  const cat=document.getElementById('txn-cat').value;
-  const notes=document.getElementById('txn-notes').value.trim();
-  if(!date||isNaN(amount)||amount<=0||!desc){toast('Please fill in date, amount, and description','error');return;}
-  await saveTxnDB({id:uid(),type,date,amount,desc,cat,notes,plaidId:null},activeId);
-  closeModal('txn-overlay');renderTab();
+const type=document.getElementById(‘txn-type’).value;
+const date=document.getElementById(‘txn-date’).value;
+const amount=parseFloat(document.getElementById(‘txn-amount’).value);
+const desc=document.getElementById(‘txn-desc’).value.trim();
+const cat=document.getElementById(‘txn-cat’).value;
+const notes=document.getElementById(‘txn-notes’).value.trim();
+if(!date||isNaN(amount)||amount<=0||!desc){toast(‘Please fill in date, amount, and description’,‘error’);return;}
+await saveTxnDB({id:uid(),type,date,amount,desc,cat,notes,plaidId:null},activeId);
+closeModal(‘txn-overlay’);renderTab();
 }
 async function delTxn(id){await delTxnDB(id);renderTab();}
 function openCatModal(){
-  const c=co();catEditing={income:[...(c.income_cats||DEF_INC)],expense:[...(c.expense_cats||DEF_EXP)]};
-  catTab='expense';document.getElementById('cat-tab-expense').classList.add('active');document.getElementById('cat-tab-income').classList.remove('active');
-  document.getElementById('new-cat-input').value='';renderCatList();openModal('cat-overlay');
+const c=co();catEditing={income:[…(c.income_cats||DEF_INC)],expense:[…(c.expense_cats||DEF_EXP)]};
+catTab=‘expense’;document.getElementById(‘cat-tab-expense’).classList.add(‘active’);document.getElementById(‘cat-tab-income’).classList.remove(‘active’);
+document.getElementById(‘new-cat-input’).value=’’;renderCatList();openModal(‘cat-overlay’);
 }
-function switchCatTab(tab){catTab=tab;document.getElementById('cat-tab-expense').classList.toggle('active',tab==='expense');document.getElementById('cat-tab-income').classList.toggle('active',tab==='income');document.getElementById('new-cat-input').value='';renderCatList();}
-function renderCatList(){const cats=catEditing[catTab];const el=document.getElementById('cat-list');if(!el)return;el.innerHTML=cats.length===0?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px;">No categories yet.</div>':cats.map((c,i)=>`<div class="cat-item" id="ci-${i}"><span class="cat-name">${c}</span><button class="icon-btn" onclick="startCatEdit(${i})">✎</button><button class="icon-btn" onclick="deleteCat(${i})">✕</button></div>`).join('');}
-function addCat(){const val=document.getElementById('new-cat-input').value.trim();if(!val||catEditing[catTab].includes(val))return;catEditing[catTab]=[...catEditing[catTab],val].sort();document.getElementById('new-cat-input').value='';renderCatList();}
+function switchCatTab(tab){catTab=tab;document.getElementById(‘cat-tab-expense’).classList.toggle(‘active’,tab===‘expense’);document.getElementById(‘cat-tab-income’).classList.toggle(‘active’,tab===‘income’);document.getElementById(‘new-cat-input’).value=’’;renderCatList();}
+function renderCatList(){const cats=catEditing[catTab];const el=document.getElementById(‘cat-list’);if(!el)return;el.innerHTML=cats.length===0?’<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px;">No categories yet.</div>’:cats.map((c,i)=>`<div class="cat-item" id="ci-${i}"><span class="cat-name">${c}</span><button class="icon-btn" onclick="startCatEdit(${i})">✎</button><button class="icon-btn" onclick="deleteCat(${i})">✕</button></div>`).join(’’);}
+function addCat(){const val=document.getElementById(‘new-cat-input’).value.trim();if(!val||catEditing[catTab].includes(val))return;catEditing[catTab]=[…catEditing[catTab],val].sort();document.getElementById(‘new-cat-input’).value=’’;renderCatList();}
 function deleteCat(i){catEditing[catTab]=catEditing[catTab].filter((_,idx)=>idx!==i);renderCatList();}
 function startCatEdit(i){const item=document.getElementById(`ci-${i}`);const name=catEditing[catTab][i];item.innerHTML=`<input class="cat-edit-input" id="ce-${i}" value="${name}" onkeydown="if(event.key==='Enter')saveCatEdit(${i});if(event.key==='Escape')renderCatList();"><button class="icon-btn" onclick="saveCatEdit(${i})">✓</button><button class="icon-btn" onclick="renderCatList()">✕</button>`;setTimeout(()=>document.getElementById(`ce-${i}`)?.focus(),50);}
 function saveCatEdit(i){const val=document.getElementById(`ce-${i}`)?.value.trim();if(!val)return;catEditing[catTab][i]=val;catEditing[catTab].sort();renderCatList();}
-async function saveCats(){companies=companies.map(c=>c.id===activeId?{...c,income_cats:catEditing.income,expense_cats:catEditing.expense}:c);await saveCo(co());closeModal('cat-overlay');toast('Categories saved');}
-function openImport(){pendingCSV=[];document.getElementById('csv-preview').innerHTML='';document.getElementById('import-confirm-btn').style.display='none';document.getElementById('csv-file').value='';openModal('import-overlay');}
+async function saveCats(){companies=companies.map(c=>c.id===activeId?{…c,income_cats:catEditing.income,expense_cats:catEditing.expense}:c);await saveCo(co());closeModal(‘cat-overlay’);toast(‘Categories saved’);}
+function openImport(){pendingCSV=[];document.getElementById(‘csv-preview’).innerHTML=’’;document.getElementById(‘import-confirm-btn’).style.display=‘none’;document.getElementById(‘csv-file’).value=’’;openModal(‘import-overlay’);}
 function handleCSV(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const lines=ev.target.result.split('\n').filter(l=>l.trim());
-    const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/['"]/g,''));
-    pendingCSV=[];
-    for(let i=1;i<lines.length;i++){
-      const cols=lines[i].split(',').map(c=>c.trim().replace(/^["']|["']$/g,''));
-      const row={};headers.forEach((h,idx)=>row[h]=cols[idx]||'');
-      const raw=parseFloat((row.amount||row.debit||row.credit||'0').replace(/[$,]/g,''));
-      const amount=Math.abs(raw);const type=row.type?row.type.toLowerCase():(raw>=0?'income':'expense');
-      const desc=row.description||row.memo||row.name||'';const date=row.date||row['transaction date']||today();
-      const cat=row.category||(type==='income'?'Other Income':'Other Expenses');
-      if(!isNaN(amount)&&amount>0&&desc)pendingCSV.push({id:uid(),type,date,amount,desc,cat,notes:'',plaidId:null});
-    }
-    const preview=document.getElementById('csv-preview');
-    if(pendingCSV.length===0){preview.innerHTML='<p style="color:var(--red);font-size:13px;">No valid rows found.</p>';return;}
-    preview.innerHTML=`<p style="color:var(--green);font-size:13px;margin-bottom:10px;">✓ Found ${pendingCSV.length} transactions ready to import.</p>`+pendingCSV.slice(0,4).map(t=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--dim);">${t.date} — ${t.desc.slice(0,38)}</span><span style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</span></div>`).join('')+(pendingCSV.length>4?`<div style="font-size:11px;color:var(--muted);padding-top:7px;">...and ${pendingCSV.length-4} more</div>`:'');
-    document.getElementById('import-confirm-btn').style.display='inline-flex';
-  };reader.readAsText(file);
+const file=e.target.files[0];if(!file)return;
+const reader=new FileReader();
+reader.onload=ev=>{
+const lines=ev.target.result.split(’\n’).filter(l=>l.trim());
+const headers=lines[0].split(’,’).map(h=>h.trim().toLowerCase().replace(/[’”]/g,’’));
+pendingCSV=[];
+for(let i=1;i<lines.length;i++){
+const cols=lines[i].split(’,’).map(c=>c.trim().replace(/^[”’]|[”’]$/g,’’));
+const row={};headers.forEach((h,idx)=>row[h]=cols[idx]||’’);
+const raw=parseFloat((row.amount||row.debit||row.credit||‘0’).replace(/[$,]/g,’’));
+const amount=Math.abs(raw);const type=row.type?row.type.toLowerCase():(raw>=0?‘income’:‘expense’);
+const desc=row.description||row.memo||row.name||’’;const date=row.date||row[‘transaction date’]||today();
+const cat=row.category||(type===‘income’?‘Other Income’:‘Other Expenses’);
+if(!isNaN(amount)&&amount>0&&desc)pendingCSV.push({id:uid(),type,date,amount,desc,cat,notes:’’,plaidId:null});
 }
-async function confirmImport(){for(const t of pendingCSV)await saveTxnDB(t,activeId);closeModal('import-overlay');toast(`✓ Imported ${pendingCSV.length} transactions`);renderTab();}
-if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+const preview=document.getElementById(‘csv-preview’);
+if(pendingCSV.length===0){preview.innerHTML=’<p style="color:var(--red);font-size:13px;">No valid rows found.</p>’;return;}
+preview.innerHTML=`<p style="color:var(--green);font-size:13px;margin-bottom:10px;">✓ Found ${pendingCSV.length} transactions ready to import.</p>`+pendingCSV.slice(0,4).map(t=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--dim);">${t.date} — ${t.desc.slice(0,38)}</span><span style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</span></div>`).join(’’)+(pendingCSV.length>4?`<div style="font-size:11px;color:var(--muted);padding-top:7px;">...and ${pendingCSV.length-4} more</div>`:’’);
+document.getElementById(‘import-confirm-btn’).style.display=‘inline-flex’;
+};reader.readAsText(file);
+}
+async function confirmImport(){for(const t of pendingCSV)await saveTxnDB(t,activeId);closeModal(‘import-overlay’);toast(`✓ Imported ${pendingCSV.length} transactions`);renderTab();}
+if(‘serviceWorker’ in navigator)navigator.serviceWorker.register(’/sw.js’).catch(()=>{});
 async function boot(){
-  document.getElementById('app').innerHTML='<div class="loading"><div class="spinner"></div></div>';
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){currentUser=session.user;await initApp();}else renderAuth();
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){currentUser=session.user;await initApp();}
-    else if(event==='SIGNED_OUT'){currentUser=null;companies=[];activeId=null;renderAuth();}
-  });
+document.getElementById(‘app’).innerHTML=’<div class="loading"><div class="spinner"></div></div>’;
+const{data:{session}}=await sb.auth.getSession();
+if(session){currentUser=session.user;await initApp();}else renderAuth();
+sb.auth.onAuthStateChange(async(event,session)=>{
+if(event===‘SIGNED_IN’&&session){currentUser=session.user;await initApp();}
+else if(event===‘SIGNED_OUT’){currentUser=null;companies=[];activeId=null;renderAuth();}
+});
 }
 boot();
 </script>
+
 </body>
 </html>
