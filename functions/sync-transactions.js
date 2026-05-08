@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     };
     if (cursor) body.cursor = cursor;
 
-    const response = await fetch('https://development.plaid.com/transactions/sync', {
+    const response = await fetch('https://production.plaid.com/transactions/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
