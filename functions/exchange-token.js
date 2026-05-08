@@ -12,7 +12,7 @@ exports.handler = async (event) => {
   try {
     const { public_token } = JSON.parse(event.body);
 
-    const response = await fetch('https://development.plaid.com/item/public_token/exchange', {
+    const response = await fetch('https://production.plaid.com/item/public_token/exchange', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
