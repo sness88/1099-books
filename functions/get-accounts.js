@@ -12,7 +12,7 @@ exports.handler = async (event) => {
   try {
     const { access_token } = JSON.parse(event.body);
 
-    const response = await fetch('https://development.plaid.com/accounts/get', {
+    const response = await fetch('https://production.plaid.com/accounts/get', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
