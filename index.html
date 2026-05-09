@@ -545,6 +545,10 @@ function renderPicker(){
             <div style="margin-left:auto;color:var(--muted);font-size:17px;">→</div>
           </div>`).join('')}
         <button class="add-co-btn" onclick="openAddCo()">+ Add New Company</button>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button onclick="exportBackup()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;">⬇ Export Backup</button>
+          <button onclick="openRestoreModal()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;">⬆ Restore Backup</button>
+        </div>
       </div>
     </div>`;
 }
