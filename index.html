@@ -11,23 +11,23 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>1099 Books</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#0C0C0B; --surface:#161614; --surface2:#1E1E1C; --surface3:#252523; --border:#2A2A27;
-  --text:#F2EDE4; --dim:#9A9585; --muted:#5A5850;
-  --green:#8FBB72; --green-bg:#1E2E14; --green-bd:#3A5A20;
-  --red:#D97B6A; --red-bg:#2E1A14; --red-bd:#5A2A1E;
-  --amber:#D4A843; --amber-bg:#2E2510;
-  --blue:#6B9BD4; --blue-bg:#141E2E; --blue-bd:#1E3A5A;
-  --accent:#C4B49A; --accent-bg:#252018;
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
+:root{--bg:#0C0C0B;--surface:#161614;--surface2:#1E1E1C;--surface3:#252523;--border:#2A2A27;--text:#F2EDE4;--dim:#9A9585;--muted:#5A5850;--green:#8FBB72;--green-bg:#1E2E14;--green-bd:#3A5A20;--red:#D97B6A;--red-bg:#2E1A14;--red-bd:#5A2A1E;--amber:#D4A843;--amber-bg:#2E2510;--blue:#6B9BD4;--blue-bg:#141E2E;--blue-bd:#1E3A5A;--accent:#C4B49A;--accent-bg:#252018;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;padding-top:var(--safe-top);}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-top:var(--safe-top);}
 .app{display:flex;min-height:100vh;}
-
-/* Sidebar */
+.auth-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh;}
+.auth-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;}
+.auth-logo{font-family:'Playfair Display',serif;font-size:36px;letter-spacing:-1px;text-align:center;margin-bottom:6px;}
+.auth-sub{font-size:12px;color:var(--muted);text-align:center;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:36px;}
+.auth-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:28px;}
+.auth-tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--dim);font-family:'Sora',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+.auth-tab.active{background:var(--surface3);color:var(--text);}
+.auth-msg{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:16px;display:none;}
+.auth-msg.show{display:block;}
+.auth-error{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
+.auth-success{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
 .sidebar{width:230px;min-width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;}
 .logo-wrap{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
 .logo{font-family:'Playfair Display',serif;font-size:20px;letter-spacing:-0.5px;}
@@ -42,38 +42,31 @@ select option{background:var(--surface2);}
 .nav-item:hover{background:var(--surface2);color:var(--text);}
 .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500;}
 .sidebar-bottom{padding:12px;border-top:1px solid var(--border);}
-
-/* Main */
+.user-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-top:4px;}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);flex-shrink:0;}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);position:sticky;top:0;z-index:20;}
 .topbar-title{font-family:'Playfair Display',serif;font-size:19px;}
 .topbar-co{font-size:12px;color:var(--muted);margin-left:10px;}
 .topbar-actions{display:flex;gap:8px;align-items:center;}
 .content{padding:24px 28px;overflow-y:auto;flex:1;padding-bottom:calc(24px + var(--safe-bottom));}
-
-/* Buttons */
 .btn{padding:8px 16px;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .btn-ghost{background:transparent;color:var(--dim);border:1px solid var(--border);}
 .btn-ghost:hover{background:var(--surface2);color:var(--text);}
 .btn-primary{background:var(--accent);color:var(--bg);}
-.btn-primary:hover{opacity:0.85;}
 .btn-income{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
 .btn-expense{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
 .btn-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);}
 .btn-full{width:100%;justify-content:center;}
 .btn:disabled{opacity:0.5;cursor:not-allowed;}
-
-/* KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
 .kpi-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .kpi-value{font-family:'Playfair Display',serif;font-size:26px;letter-spacing:-1px;}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px;}
-.c-green{color:var(--green);} .c-red{color:var(--red);} .c-amber{color:var(--amber);} .c-blue{color:var(--blue);}
-
-/* Table */
+.c-green{color:var(--green);}.c-red{color:var(--red);}.c-amber{color:var(--amber);}
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
 table{width:100%;border-collapse:collapse;}
 thead th{padding:10px 14px;text-align:left;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400;border-bottom:1px solid var(--border);}
@@ -87,28 +80,20 @@ tbody td{padding:11px 14px;font-size:13px;}
 .type-badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
 .type-income{background:var(--green-bg);color:var(--green);}
 .type-expense{background:var(--red-bg);color:var(--red);}
-.bank-tag{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);border-radius:3px;font-size:9px;padding:1px 5px;vertical-align:middle;}
-.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 7px;border-radius:5px;transition:all 0.1s;}
+.bank-tag{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);border-radius:3px;font-size:9px;padding:1px 5px;}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 7px;border-radius:5px;}
 .del-btn:hover{color:var(--red);background:var(--red-bg);}
 .empty{padding:48px;text-align:center;color:var(--muted);font-size:13px;}
-
-/* Filters */
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
 .filter-bar input,.filter-bar select{padding:7px 11px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:13px;outline:none;}
 .filter-bar input{width:180px;}
-
-/* Section label */
 .sec-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-
-/* Progress */
 .progress-wrap{margin-bottom:13px;}
 .progress-header{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;}
 .progress-bar{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;}
 .progress-fill{height:100%;background:var(--red);border-radius:99px;transition:width 0.4s ease;}
-
-/* P&L */
 .pl-months{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
-.month-btn{padding:4px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:11px;font-family:monospace;cursor:pointer;transition:all 0.1s;}
+.month-btn{padding:4px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:11px;font-family:monospace;cursor:pointer;}
 .month-btn.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent);}
 .net-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:26px;text-align:center;margin-bottom:22px;}
 .net-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
@@ -119,738 +104,329 @@ tbody td{padding:11px 14px;font-size:13px;}
 .pl-row{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);font-size:13px;}
 .pl-row:last-child{border-bottom:none;}
 .pl-total{display:flex;justify-content:space-between;padding:13px 18px;background:var(--surface2);font-weight:600;font-size:13px;}
-
-/* Tax */
 .tax-hero{background:var(--amber-bg);border:1px solid #4A3A10;border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
 .tax-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-
-/* Bank panel */
 .bank-panel{background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:12px;padding:16px 20px;margin-bottom:22px;}
 .bank-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .bank-acct-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:10px 13px;margin-top:8px;}
 .bank-cta{background:var(--surface);border:1px dashed var(--blue-bd);border-radius:12px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;}
-
-/* Modals */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:460px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;animation:slideUp 0.18s ease;}
 .modal-wide{width:640px;}
 .modal-hdr{padding:17px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .modal-title{font-family:'Playfair Display',serif;font-size:17px;}
-.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 6px;}
 .modal-body{padding:22px;overflow-y:auto;flex:1;}
 .modal-footer{padding:13px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .form-group{margin-bottom:15px;}
 .field-label{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.field{width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:14px;outline:none;transition:border-color 0.15s;}
+.field{width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:14px;outline:none;}
 .field:focus{border-color:var(--accent);}
-
-/* Category Manager */
 .cat-tabs{display:flex;gap:8px;margin-bottom:18px;}
-.cat-tab{padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--dim);border:1px solid transparent;transition:all 0.1s;}
+.cat-tab{padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--dim);border:1px solid transparent;}
 .cat-tab.active{background:var(--surface3);color:var(--text);border-color:var(--border);}
 .cat-list{max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
 .cat-item{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
 .cat-name{flex:1;font-size:13px;}
 .cat-edit-input{flex:1;padding:3px 8px;background:var(--surface3);border:1px solid var(--accent);border-radius:6px;color:var(--text);font-family:'Sora',sans-serif;font-size:13px;outline:none;}
-.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 7px;border-radius:5px;transition:all 0.1s;}
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 7px;border-radius:5px;}
 .icon-btn:hover{color:var(--text);background:var(--surface3);}
-
-/* Import zone */
-.import-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;color:var(--muted);transition:all 0.15s;}
-.import-zone:hover{border-color:var(--accent);color:var(--dim);}
-
-/* Company picker */
+.import-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;color:var(--muted);}
+.import-zone:hover{border-color:var(--accent);}
 .picker{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
 .picker-inner{width:100%;max-width:480px;}
 .co-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:17px 20px;cursor:pointer;display:flex;align-items:center;gap:15px;margin-bottom:10px;transition:border-color 0.15s;}
 .co-card:hover{border-color:var(--accent);}
 .co-avatar{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;flex-shrink:0;}
 .add-co-btn{width:100%;padding:13px;background:transparent;border:1px dashed var(--border);border-radius:12px;color:var(--dim);font-family:'Sora',sans-serif;font-size:14px;cursor:pointer;margin-top:4px;}
-.add-co-btn:hover{background:var(--surface2);color:var(--text);}
-
-/* Toast */
-.toast{position:fixed;bottom:calc(24px + var(--safe-bottom));right:24px;z-index:999;padding:11px 18px;border-radius:10px;font-size:13px;animation:fadeIn 0.2s ease;max-width:300px;display:none;}
+.toast{position:fixed;bottom:calc(24px + var(--safe-bottom));right:24px;z-index:999;padding:11px 18px;border-radius:10px;font-size:13px;max-width:300px;display:none;}
 .toast.show{display:block;}
 .toast-success{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
 .toast-error{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
 .toast-info{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);}
-
-/* Install banner */
-.install-banner{background:var(--accent-bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-
-/* Spinner */
-.spin{display:inline-block;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* Bottom nav mobile */
+.loading{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;min-height:100vh;}
+.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+.spin{animation:spin 0.8s linear infinite;display:inline-block;}
 .bottom-nav{display:none;}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
-
-/* Animations */
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 @keyframes slideUp{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-
-/* Mobile */
+@keyframes spin{to{transform:rotate(360deg);}}
 @media(max-width:768px){
-  .sidebar{display:none;}
-  .kpi-grid{grid-template-columns:1fr 1fr;}
-  .pl-grid,.tax-grid{grid-template-columns:1fr;}
-  .topbar{padding:12px 16px;}
-  .content{padding:16px;padding-bottom:calc(80px + var(--safe-bottom));}
-  .tax-hero{flex-direction:column;align-items:flex-start;gap:10px;}
-  .bank-cta{flex-direction:column;align-items:flex-start;gap:12px;}
-  .topbar-co{display:none;}
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0;padding-bottom:calc(8px + var(--safe-bottom));z-index:30;}
-  .bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;color:var(--muted);font-size:10px;transition:color 0.1s;}
-  .bottom-nav-item.active{color:var(--accent);}
-  .bottom-nav-icon{font-size:20px;line-height:1;}
-  .form-row{grid-template-columns:1fr;gap:0;}
-  .install-banner{flex-direction:column;align-items:flex-start;}
+.sidebar{display:none;}
+.kpi-grid{grid-template-columns:1fr 1fr;}
+.pl-grid,.tax-grid{grid-template-columns:1fr;}
+.topbar{padding:12px 16px;}
+.content{padding:16px;padding-bottom:calc(80px + var(--safe-bottom));}
+.tax-hero,.bank-cta{flex-direction:column;align-items:flex-start;gap:10px;}
+.topbar-co{display:none;}
+.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0;padding-bottom:calc(8px + var(--safe-bottom));z-index:30;}
+.bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;color:var(--muted);font-size:10px;}
+.bottom-nav-item.active{color:var(--accent);}
+.bottom-nav-icon{font-size:20px;line-height:1;}
+.form-row{grid-template-columns:1fr;gap:0;}
 }
-@media(max-width:480px){
-  .kpi-grid{gap:10px;}
-  .kpi-value{font-size:20px;}
-  .filter-bar input{width:130px;}
-  .net-value{font-size:36px;}
-}
+@media(max-width:480px){.kpi-grid{gap:10px;}.kpi-value{font-size:20px;}.net-value{font-size:36px;}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div class="toast" id="toast"></div>
-
-<!-- Add Transaction Modal -->
-<div class="overlay" id="txn-overlay">
-  <div class="modal">
-    <div class="modal-hdr">
-      <span class="modal-title" id="txn-modal-title">Add Income</span>
-      <button class="modal-close" onclick="closeModal('txn-overlay')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="txn-type" value="income">
-      <div class="form-row">
-        <div class="form-group"><label class="field-label">Date</label><input type="date" class="field" id="txn-date"></div>
-        <div class="form-group"><label class="field-label">Amount ($)</label><input type="number" class="field" id="txn-amount" placeholder="0.00" step="0.01" min="0"></div>
-      </div>
-      <div class="form-group"><label class="field-label">Description</label><input type="text" class="field" id="txn-desc" placeholder="e.g. Memorial Hospital reading fees"></div>
-      <div class="form-group"><label class="field-label">Category</label><select class="field" id="txn-cat"></select></div>
-      <div class="form-group"><label class="field-label">Notes (optional)</label><input type="text" class="field" id="txn-notes" placeholder="Any additional notes..."></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('txn-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveTxn()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Company Modal -->
-<div class="overlay" id="add-co-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">Add Company</span><button class="modal-close" onclick="closeModal('add-co-overlay')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="field-label">Company Name</label><input type="text" class="field" id="new-co-name" placeholder="e.g. Dr. Smith Radiology LLC" onkeydown="if(event.key==='Enter')addCompany()"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('add-co-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="addCompany()">Create</button>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Company Modal -->
-<div class="overlay" id="edit-co-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">Edit Company</span><button class="modal-close" onclick="closeModal('edit-co-overlay')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="field-label">Company Name</label><input type="text" class="field" id="edit-co-name" onkeydown="if(event.key==='Enter')saveEditCompany()"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger" onclick="confirmDeleteCompany()">Delete Company</button>
-      <button class="btn btn-ghost" onclick="closeModal('edit-co-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEditCompany()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Confirm Modal -->
-<div class="overlay" id="del-co-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">Delete Company</span><button class="modal-close" onclick="closeModal('del-co-overlay')">✕</button></div>
-    <div class="modal-body"><p style="color:var(--dim);font-size:14px;line-height:1.6;" id="del-co-msg"></p></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('del-co-overlay')">Cancel</button>
-      <button class="btn btn-danger" onclick="deleteCompany()">Yes, Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- Category Manager Modal -->
-<div class="overlay" id="cat-overlay">
-  <div class="modal modal-wide">
-    <div class="modal-hdr"><span class="modal-title">Manage Categories</span><button class="modal-close" onclick="closeModal('cat-overlay')">✕</button></div>
-    <div class="modal-body">
-      <div class="cat-tabs">
-        <button class="cat-tab active" id="cat-tab-expense" onclick="switchCatTab('expense')">Expense Categories</button>
-        <button class="cat-tab" id="cat-tab-income" onclick="switchCatTab('income')">Income Categories</button>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:14px;">
-        <input type="text" class="field" id="new-cat-input" placeholder="New category name..." style="flex:1;" onkeydown="if(event.key==='Enter')addCat()">
-        <button class="btn btn-primary" onclick="addCat()">Add</button>
-      </div>
-      <div class="cat-list" id="cat-list"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('cat-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveCats()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<!-- Restore Backup Modal -->
-<div class="overlay" id="restore-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">⬆ Restore Backup</span><button class="modal-close" onclick="closeModal('restore-overlay')">✕</button></div>
-    <div class="modal-body">
-      <p style="color:var(--dim);font-size:13px;margin-bottom:14px;">Select a backup file exported from 1099 Books to restore your data on this device.</p>
-      <div class="import-zone" onclick="document.getElementById('restore-file').click()">
-        <div style="font-size:26px;margin-bottom:7px;">📦</div>
-        <p style="font-size:13px;">Tap to choose a backup file</p>
-        <p style="font-size:11px;margin-top:4px;">File should end in .json</p>
-      </div>
-      <input type="file" id="restore-file" accept=".json" style="display:none" onchange="handleRestoreFile(event)">
-      <div id="restore-preview" style="margin-top:14px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('restore-overlay')">Cancel</button>
-      <button class="btn btn-primary" id="restore-confirm-btn" style="display:none">Restore Data</button>
-    </div>
-  </div>
-</div>
-
-<!-- Import CSV Modal -->
-<div class="overlay" id="import-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">Import CSV</span><button class="modal-close" onclick="closeModal('import-overlay')">✕</button></div>
-    <div class="modal-body">
-      <p style="color:var(--dim);font-size:13px;margin-bottom:14px;">Expected columns: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px;color:var(--accent);">date, description, amount, type, category</code></p>
-      <div class="import-zone" onclick="document.getElementById('csv-file').click()">
-        <div style="font-size:26px;margin-bottom:7px;">📂</div>
-        <p style="font-size:13px;">Tap to choose a CSV file</p>
-        <p style="font-size:11px;margin-top:4px;">Most banks let you export transactions as CSV</p>
-      </div>
-      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleCSV(event)">
-      <div id="csv-preview" style="margin-top:14px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('import-overlay')">Cancel</button>
-      <button class="btn btn-primary" id="import-confirm-btn" style="display:none" onclick="confirmImport()">Import Transactions</button>
-    </div>
-  </div>
-</div>
-
+<div class="overlay" id="txn-overlay"><div class="modal"><div class="modal-hdr"><span class="modal-title" id="txn-modal-title">Add Income</span><button class="modal-close" onclick="closeModal('txn-overlay')">&#x2715;</button></div><div class="modal-body"><input type="hidden" id="txn-type" value="income"><div class="form-row"><div class="form-group"><label class="field-label">Date</label><input type="date" class="field" id="txn-date"></div><div class="form-group"><label class="field-label">Amount ($)</label><input type="number" class="field" id="txn-amount" placeholder="0.00" step="0.01" min="0"></div></div><div class="form-group"><label class="field-label">Description</label><input type="text" class="field" id="txn-desc" placeholder="e.g. Memorial Hospital reading fees"></div><div class="form-group"><label class="field-label">Category</label><select class="field" id="txn-cat"></select></div><div class="form-group"><label class="field-label">Notes (optional)</label><input type="text" class="field" id="txn-notes" placeholder="Any additional notes..."></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('txn-overlay')">Cancel</button><button class="btn btn-primary" onclick="saveTxn()">Save</button></div></div></div>
+<div class="overlay" id="add-co-overlay"><div class="modal"><div class="modal-hdr"><span class="modal-title">Add Company</span><button class="modal-close" onclick="closeModal('add-co-overlay')">&#x2715;</button></div><div class="modal-body"><div class="form-group"><label class="field-label">Company Name</label><input type="text" class="field" id="new-co-name" placeholder="e.g. Dr. Smith Radiology LLC" onkeydown="if(event.key==='Enter')addCompany()"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('add-co-overlay')">Cancel</button><button class="btn btn-primary" onclick="addCompany()">Create</button></div></div></div>
+<div class="overlay" id="edit-co-overlay"><div class="modal"><div class="modal-hdr"><span class="modal-title">Edit Company</span><button class="modal-close" onclick="closeModal('edit-co-overlay')">&#x2715;</button></div><div class="modal-body"><div class="form-group"><label class="field-label">Company Name</label><input type="text" class="field" id="edit-co-name"></div></div><div class="modal-footer"><button class="btn btn-danger" onclick="confirmDeleteCompany()">Delete Company</button><button class="btn btn-ghost" onclick="closeModal('edit-co-overlay')">Cancel</button><button class="btn btn-primary" onclick="saveEditCompany()">Save</button></div></div></div>
+<div class="overlay" id="del-co-overlay"><div class="modal"><div class="modal-hdr"><span class="modal-title">Delete Company</span><button class="modal-close" onclick="closeModal('del-co-overlay')">&#x2715;</button></div><div class="modal-body"><p style="color:var(--dim);font-size:14px;line-height:1.6;" id="del-co-msg"></p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('del-co-overlay')">Cancel</button><button class="btn btn-danger" onclick="deleteCompany()">Yes, Delete</button></div></div></div>
+<div class="overlay" id="cat-overlay"><div class="modal modal-wide"><div class="modal-hdr"><span class="modal-title">Manage Categories</span><button class="modal-close" onclick="closeModal('cat-overlay')">&#x2715;</button></div><div class="modal-body"><div class="cat-tabs"><button class="cat-tab active" id="cat-tab-expense" onclick="switchCatTab('expense')">Expense Categories</button><button class="cat-tab" id="cat-tab-income" onclick="switchCatTab('income')">Income Categories</button></div><div style="display:flex;gap:10px;margin-bottom:14px;"><input type="text" class="field" id="new-cat-input" placeholder="New category name..." style="flex:1;" onkeydown="if(event.key==='Enter')addCat()"><button class="btn btn-primary" onclick="addCat()">Add</button></div><div class="cat-list" id="cat-list"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('cat-overlay')">Cancel</button><button class="btn btn-primary" onclick="saveCats()">Save Changes</button></div></div></div>
+<div class="overlay" id="import-overlay"><div class="modal"><div class="modal-hdr"><span class="modal-title">Import CSV</span><button class="modal-close" onclick="closeModal('import-overlay')">&#x2715;</button></div><div class="modal-body"><p style="color:var(--dim);font-size:13px;margin-bottom:14px;">Expected columns: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px;color:var(--accent);">date, description, amount, type, category</code></p><div class="import-zone" onclick="document.getElementById('csv-file').click()"><div style="font-size:26px;margin-bottom:7px;">&#x1F4C2;</div><p style="font-size:13px;">Tap to choose a CSV file</p></div><input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleCSV(event)"><div id="csv-preview" style="margin-top:14px;"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('import-overlay')">Cancel</button><button class="btn btn-primary" id="import-confirm-btn" style="display:none" onclick="confirmImport()">Import Transactions</button></div></div></div>
 <script>
-// ─── Constants & State ────────────────────────────────────────────────────────
-const STORAGE_KEY = 'books1099_pwa_v2';
-const COLORS = ['#7B9E6B','#6B8FB5','#B5896B','#9B6BB5','#B56B6B','#6BB5A8','#B5A86B','#8B6BB5'];
-const DEF_EXP = ['401k Contributions','Accounting Fees','Licensing','Meals','Payroll - Employer Taxes','Payroll - Salary & Wages','Supplies','Vehicle (Fuel)','Vehicle (Repairs & Maintenance)'];
-const DEF_INC = ['Services Rendered','Consulting','Contract Work','Other Income'];
-
-let state = { companies:[], activeId:null };
-let currentTab = 'dashboard';
-let plMonth = 'all';
-let txnFilters = {search:'',type:'',cat:'',month:''};
-let catTab = 'expense';
-let catEditing = {income:[],expense:[]};
-let pendingCSV = [];
-let deferredInstall = null;
-let syncingBank = false;
-
-function uid(){ return Math.random().toString(36).slice(2,9)+Date.now().toString(36); }
-function fmt(n){ return '$'+Math.abs(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function today(){ return new Date().toISOString().slice(0,10); }
-function oneYearAgo(){ const d=new Date();d.setFullYear(d.getFullYear()-1);return d.toISOString().slice(0,10); }
-
-function load(){ try{const s=localStorage.getItem(STORAGE_KEY);if(s)state=JSON.parse(s);}catch{} }
-function save(){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{} }
-function co(){ return state.companies.find(c=>c.id===state.activeId); }
-function updateCo(fn){ state.companies=state.companies.map(c=>c.id===state.activeId?fn(c):c);save(); }
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
+const SUPABASE_URL='https://qvedtpvludvmhicnadfm.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2ZWR0cHZsdWR2bWhpY25hZGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNzY5NzgsImV4cCI6MjA5MzY1Mjk3OH0.bXv0XLl_HKkZYKX4H441gedFKwgtC8LoQ34R9XzQpgc';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const COLORS=['#7B9E6B','#6B8FB5','#B5896B','#9B6BB5','#B56B6B','#6BB5A8','#B5A86B','#8B6BB5'];
+const DEF_EXP=['401k Contributions','Accounting Fees','Licensing','Meals','Payroll - Employer Taxes','Payroll - Salary & Wages','Supplies','Vehicle (Fuel)','Vehicle (Repairs & Maintenance)'];
+const DEF_INC=['Services Rendered','Consulting','Contract Work','Other Income'];
+let currentUser=null,companies=[],activeId=null,currentTab='dashboard',plMonth='all';
+let txnFilters={search:'',type:'',cat:'',month:''};
+let catTab='expense',catEditing={income:[],expense:[]},pendingCSV=[],syncingBank=false;
+let authMode='signin';
+function uid(){return crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36);}
+function fmt(n){return '$'+Math.abs(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function today(){return new Date().toISOString().slice(0,10);}
+function co(){return companies.find(c=>c.id===activeId);}
 let toastTimer;
-function toast(msg,type='success'){
-  const el=document.getElementById('toast');
-  el.textContent=msg;
-  el.className='toast show toast-'+type;
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),3500);
-}
-
-// ─── Modals ───────────────────────────────────────────────────────────────────
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show toast-'+type;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(el=>el.classList.remove('open'));});
-
-// ─── API calls (via Netlify functions — no CORS issues) ───────────────────────
-async function api(endpoint, body){
-  const res = await fetch('/api/'+endpoint, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  const data = await res.json();
-  if(data.error) throw new Error(data.error);
-  return data;
-}
-
-// ─── Plaid helpers ────────────────────────────────────────────────────────────
-async function createLinkToken(){ return api('create-link-token',{}); }
-async function exchangeToken(public_token){ return api('exchange-token',{public_token}); }
-async function getAccounts(access_token){ return api('get-accounts',{access_token}); }
-
-async function syncAllTransactions(access_token){
-  let cursor=undefined, added=[], hasMore=true;
-  while(hasMore){
-    const body={access_token};
-    if(cursor)body.cursor=cursor;
-    const data=await api('sync-transactions',body);
-    added=added.concat(data.added||[]);
-    hasMore=data.has_more;
-    cursor=data.next_cursor;
-    if(!hasMore)break;
-  }
-  return added;
-}
-
-function plaidTxnToLocal(t){
-  const amount=Math.abs(t.amount);
-  const type=t.amount>0?'expense':'income'; // Plaid: positive = money out
-  const rawCat=t.personal_finance_category?.primary||'';
-  const cat=type==='income'?'Other Income':(rawCat?rawCat.replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):'Other Expenses');
-  return {id:'plaid_'+t.transaction_id,type,date:t.date,amount,desc:t.merchant_name||t.name||'Unknown',cat,notes:'',plaidId:t.transaction_id};
-}
-
-// ─── Connect Bank (Plaid Link) ────────────────────────────────────────────────
+async function loadCompanies(){const{data}=await sb.from('companies').select('*').order('created_at');companies=data||[];if(companies.length>0&&!activeId)activeId=companies[0].id;}
+async function loadTxns(cid){const{data}=await sb.from('transactions').select('*').eq('company_id',cid).order('date',{ascending:false});return(data||[]).map(t=>({id:t.id,type:t.type,date:t.date,amount:parseFloat(t.amount),desc:t.description,cat:t.category,notes:t.notes||'',plaidId:t.plaid_id||null}));}
+async function saveCo(c){const{data}=await sb.from('companies').upsert({id:c.id,user_id:currentUser.id,name:c.name,income_cats:c.income_cats||DEF_INC,expense_cats:c.expense_cats||DEF_EXP,plaid_connections:c.plaid_connections||[],last_sync:c.last_sync||null}).select().single();return data;}
+async function saveTxnDB(t,cid){await sb.from('transactions').insert({id:t.id,company_id:cid,user_id:currentUser.id,type:t.type,date:t.date,amount:t.amount,description:t.desc,category:t.cat,notes:t.notes||'',plaid_id:t.plaidId||null});}
+async function delTxnDB(id){await sb.from('transactions').delete().eq('id',id);}
+async function delCoDB(cid){await sb.from('transactions').delete().eq('company_id',cid);await sb.from('companies').delete().eq('id',cid);}
+async function api(ep,body){const r=await fetch('/api/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.error)throw new Error(d.error);return d;}
 async function connectBank(){
-  toast('Initializing bank connection...','info');
-  try {
-    const {link_token} = await createLinkToken();
-
-    // Load Plaid Link script if not already loaded
-    await new Promise((resolve,reject)=>{
-      if(window.Plaid){resolve();return;}
-      const s=document.createElement('script');
-      s.src='https://cdn.plaid.com/link/v2/stable/link-initialize.js';
-      s.onload=resolve;
-      s.onerror=()=>reject(new Error('Failed to load Plaid script'));
-      document.head.appendChild(s);
-    });
-
-    window.Plaid.create({
-      token: link_token,
-      onSuccess: async (public_token, metadata) => {
-        toast('Connecting account...','info');
-        try {
-          const {access_token} = await exchangeToken(public_token);
-          const {accounts} = await getAccounts(access_token);
-          const institutionName = metadata?.institution?.name||'Bank';
-
-          // Save connection
-          updateCo(c=>({...c, plaidConnections:[...(c.plaidConnections||[]),{access_token,accounts,institutionName}]}));
-
-          // Auto-sync transactions
+  toast('Initializing...','info');
+  try{
+    const{link_token}=await api('create-link-token',{});
+    await new Promise((res,rej)=>{if(window.Plaid){res();return;}const s=document.createElement('script');s.src='https://cdn.plaid.com/link/v2/stable/link-initialize.js';s.onload=res;s.onerror=()=>rej(new Error('Failed to load Plaid'));document.head.appendChild(s);});
+    if(window._plaidHandler){try{window._plaidHandler.destroy();}catch(e){}}
+    window._plaidHandler=window.Plaid.create({token:link_token,
+      onSuccess:async(pt,meta)=>{
+        toast('Connecting...','info');
+        try{
+          const{access_token}=await api('exchange-token',{public_token:pt});
+          const{accounts}=await api('get-accounts',{access_token});
+          const inst=meta?.institution?.name||'Bank';
+          const conns=[...(co().plaid_connections||[]),{access_token,accounts,institutionName:inst}];
+          companies=companies.map(c=>c.id===activeId?{...c,plaid_connections:conns}:c);
+          await saveCo(co());
           toast('Importing transactions...','info');
-          const raw = await syncAllTransactions(access_token);
-          const existingIds = new Set((co().transactions||[]).map(t=>t.plaidId).filter(Boolean));
-          const newTxns = raw.filter(t=>!existingIds.has(t.transaction_id)).map(plaidTxnToLocal);
-
-          updateCo(c=>({...c,transactions:[...(c.transactions||[]),...newTxns],lastSync:new Date().toLocaleString()}));
-          toast(`✓ ${institutionName} connected! Imported ${newTxns.length} transactions.`);
-          renderTab();
-        } catch(e){
-          toast('Connection error: '+e.message,'error');
-        }
+          await syncConn({access_token,institutionName:inst});
+        }catch(e){toast('Error: '+e.message,'error');}
       },
-      onExit:(err)=>{
-        if(err)toast('Bank connection cancelled','info');
-      }
+      onExit:()=>{}
     }).open();
-  } catch(e){
-    toast('Could not initialize bank connection: '+e.message,'error');
-  }
+  }catch(e){toast('Could not connect: '+e.message,'error');}
 }
-
-// ─── Sync Transactions ────────────────────────────────────────────────────────
-async function syncBank(){
-  const company = co();
-  const connections = company.plaidConnections||[];
-  if(connections.length===0){toast('No banks connected','error');return;}
-  if(syncingBank)return;
-  syncingBank=true;
-  renderTab();
-  toast('Syncing transactions...','info');
-  try {
-    let totalNew=0;
-    for(const conn of connections){
-      const raw=await syncAllTransactions(conn.access_token);
-      const existingIds=new Set((co().transactions||[]).map(t=>t.plaidId).filter(Boolean));
-      const newTxns=raw.filter(t=>!existingIds.has(t.transaction_id)).map(plaidTxnToLocal);
-      if(newTxns.length>0){
-        updateCo(c=>({...c,transactions:[...(c.transactions||[]),...newTxns]}));
-        totalNew+=newTxns.length;
-      }
+async function syncConn(conn){
+  try{
+    const end=new Date().toISOString().slice(0,10);
+    const s=new Date();s.setFullYear(s.getFullYear()-1);
+    const start=s.toISOString().slice(0,10);
+    let added=[],offset=0,total=null;
+    while(total===null||offset<total){
+      const d=await api('get-transactions',{access_token:conn.access_token,start_date:start,end_date:end,offset,count:500});
+      added=added.concat(d.transactions||[]);
+      total=d.total_transactions||0;
+      offset+=(d.transactions?.length||0);
+      if(!d.transactions?.length)break;
     }
-    updateCo(c=>({...c,lastSync:new Date().toLocaleString()}));
-    toast(totalNew>0?`✓ Synced ${totalNew} new transactions`:'✓ Already up to date');
-  } catch(e){
-    toast('Sync error: '+e.message,'error');
-  }
-  syncingBank=false;
-  renderTab();
+    const existing=new Set((await loadTxns(activeId)).map(t=>t.plaidId).filter(Boolean));
+    const newT=added.filter(t=>!existing.has(t.transaction_id));
+    for(const t of newT){
+      const loc={id:uid(),type:t.amount>0?'expense':'income',date:t.date,amount:Math.abs(t.amount),desc:t.merchant_name||t.name||'Unknown',cat:t.amount>0?(t.personal_finance_category?.primary||'Other Expenses').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'Other Income',notes:'',plaidId:t.transaction_id};
+      await saveTxnDB(loc,activeId);
+    }
+    const now=new Date().toLocaleString();
+    companies=companies.map(c=>c.id===activeId?{...c,last_sync:now}:c);
+    await saveCo(co());
+    toast('Synced '+newT.length+' new transactions');
+    renderTab();
+  }catch(e){toast('Sync error: '+e.message,'error');}
 }
-
-function disconnectBank(idx){
-  updateCo(c=>({...c,plaidConnections:(c.plaidConnections||[]).filter((_,i)=>i!==idx)}));
-  toast('Bank disconnected');
-  renderTab();
+async function syncAllBanks(){
+  if(syncingBank)return;syncingBank=true;renderTab();
+  toast('Syncing...','info');
+  for(const conn of co()?.plaid_connections||[])await syncConn(conn);
+  syncingBank=false;renderTab();
 }
-
-// ─── Render ───────────────────────────────────────────────────────────────────
-function render(){
-  const company=co();
-  if(!company){renderPicker();return;}
-  renderApp(company);
+async function disconnectBank(idx){
+  const conns=(co()?.plaid_connections||[]).filter((_,i)=>i!==idx);
+  companies=companies.map(c=>c.id===activeId?{...c,plaid_connections:conns}:c);
+  await saveCo(co());toast('Bank disconnected');renderTab();
 }
-
+function renderAuth(){
+  document.getElementById('app').innerHTML=`
+    <div class="auth-screen"><div class="auth-card">
+      <div class="auth-logo">1099 Books</div>
+      <div class="auth-sub">Business Finance</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      <div class="auth-msg auth-error" id="auth-error"></div>
+      <div class="auth-msg auth-success" id="auth-success"></div>
+      <div class="form-group"><label class="field-label">Email</label><input type="email" class="field" id="auth-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')handleAuth()"></div>
+      <div class="form-group"><label class="field-label">Password</label><input type="password" class="field" id="auth-password" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" onkeydown="if(event.key==='Enter')handleAuth()"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="handleAuth()" id="auth-btn">Sign In</button>
+      <div style="text-align:center;margin-top:14px;"><button onclick="forgotPw()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Forgot password?</button></div>
+    </div></div>`;}
+function switchAuthTab(m){authMode=m;document.getElementById('tab-signin').classList.toggle('active',m==='signin');document.getElementById('tab-signup').classList.toggle('active',m==='signup');document.getElementById('auth-btn').textContent=m==='signin'?'Sign In':'Create Account';}
+async function handleAuth(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pw=document.getElementById('auth-password').value;
+  const err=document.getElementById('auth-error');const suc=document.getElementById('auth-success');
+  err.classList.remove('show');suc.classList.remove('show');
+  if(!email||!pw){err.textContent='Please enter email and password.';err.classList.add('show');return;}
+  const btn=document.getElementById('auth-btn');btn.textContent='Loading...';btn.disabled=true;
+  try{
+    if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;currentUser=data.user;await initApp();}
+    else{const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;suc.textContent='Account created! Check your email to confirm, then sign in.';suc.classList.add('show');}
+  }catch(e){err.textContent=e.message;err.classList.add('show');}
+  btn.textContent=authMode==='signin'?'Sign In':'Create Account';btn.disabled=false;
+}
+async function forgotPw(){
+  const email=document.getElementById('auth-email').value.trim();
+  if(!email){document.getElementById('auth-error').textContent='Enter your email first.';document.getElementById('auth-error').classList.add('show');return;}
+  const{error}=await sb.auth.resetPasswordForEmail(email);
+  if(error){document.getElementById('auth-error').textContent=error.message;document.getElementById('auth-error').classList.add('show');}
+  else{document.getElementById('auth-success').textContent='Password reset email sent!';document.getElementById('auth-success').classList.add('show');}
+}
+async function signOut(){await sb.auth.signOut();currentUser=null;companies=[];activeId=null;renderAuth();}
+async function initApp(){
+  document.getElementById('app').innerHTML='<div class="loading"><div class="spinner"></div><div style="color:var(--muted);font-size:13px;">Loading your data...</div></div>';
+  await loadCompanies();currentTab='dashboard';render();
+}
+function render(){if(!co()){renderPicker();return;}renderAppShell();}
 function renderPicker(){
-  document.getElementById('app').innerHTML=`
-    <div class="picker">
-      <div class="picker-inner">
-        <div style="font-family:'Playfair Display',serif;font-size:44px;letter-spacing:-2px;text-align:center;margin-bottom:6px;">1099 Books</div>
-        <div style="font-size:13px;color:var(--dim);text-align:center;margin-bottom:44px;">Select a company to continue</div>
-        ${state.companies.map((c,i)=>`
-          <div class="co-card" onclick="selectCo('${c.id}')">
-            <div class="co-avatar" style="background:${COLORS[i%COLORS.length]}22;border:1px solid ${COLORS[i%COLORS.length]}44;color:${COLORS[i%COLORS.length]};">${c.name[0].toUpperCase()}</div>
-            <div>
-              <div style="font-size:14px;font-weight:500;">${c.name}</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;">${c.transactions?.length||0} transactions${(c.plaidConnections?.length>0)?` · <span style="color:var(--blue)">🏦 Bank linked</span>`:''}
-              </div>
-            </div>
-            <div style="margin-left:auto;color:var(--muted);font-size:17px;">→</div>
-          </div>`).join('')}
-        <button class="add-co-btn" onclick="openAddCo()">+ Add New Company</button>
-        <div style="display:flex;gap:10px;margin-top:12px;">
-          <button onclick="exportBackup()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;">⬇ Export Backup</button>
-          <button onclick="openRestoreModal()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--dim);font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;">⬆ Restore Backup</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-function renderApp(company){
-  const navItems=[{id:'dashboard',icon:'◈',label:'Dashboard'},{id:'transactions',icon:'≡',label:'Transactions'},{id:'pl',icon:'⊞',label:'P&L'},{id:'taxes',icon:'◇',label:'Tax Estimate'}];
+  document.getElementById('app').innerHTML=`<div class="picker"><div class="picker-inner">
+    <div style="font-family:'Playfair Display',serif;font-size:44px;letter-spacing:-2px;text-align:center;margin-bottom:6px;">1099 Books</div>
+    <div style="font-size:13px;color:var(--dim);text-align:center;margin-bottom:44px;">Select a company to continue</div>
+    ${companies.map((c,i)=>`<div class="co-card" onclick="selectCo('${c.id}')"><div class="co-avatar" style="background:${COLORS[i%COLORS.length]}22;border:1px solid ${COLORS[i%COLORS.length]}44;color:${COLORS[i%COLORS.length]};">${c.name[0].toUpperCase()}</div><div><div style="font-size:14px;font-weight:500;">${c.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${(c.plaid_connections||[]).length>0?'&#x1F3E6; Bank linked':''}</div></div><div style="margin-left:auto;color:var(--muted);font-size:17px;">&#x2192;</div></div>`).join('')}
+    <button class="add-co-btn" onclick="openAddCo()">+ Add New Company</button>
+    <div style="text-align:center;margin-top:20px;"><button onclick="signOut()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Sign out (${currentUser?.email||''})</button></div>
+  </div></div>`;}
+function renderAppShell(){
+  const c=co();
+  const nav=[{id:'dashboard',icon:'&#x25C8;',label:'Dashboard'},{id:'transactions',icon:'&#x2261;',label:'Transactions'},{id:'pl',icon:'&#x229E;',label:'P&L'},{id:'taxes',icon:'&#x25C7;',label:'Tax Estimate'}];
   const titles={dashboard:'Dashboard',transactions:'Transactions',pl:'P&L Statement',taxes:'Tax Estimate'};
-  document.getElementById('app').innerHTML=`
-    <div class="app">
-      <aside class="sidebar">
-        <div class="logo-wrap"><div class="logo">1099 Books</div><div class="logo-sub">Business Finance</div></div>
-        <div class="co-wrap">
-          <div class="co-label">Company</div>
-          <select class="co-select" onchange="selectCo(this.value)">
-            ${state.companies.map(c=>`<option value="${c.id}"${c.id===state.activeId?' selected':''}>${c.name}</option>`).join('')}
-          </select>
-          <button class="btn btn-ghost btn-sm btn-full" onclick="openAddCo()">+ Add Company</button>
-        </div>
-        <div class="nav-wrap">
-          <div class="nav-lbl">Navigate</div>
-          ${navItems.map(n=>`<div class="nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')">${n.icon} ${n.label}</div>`).join('')}
-        </div>
-        <div class="sidebar-bottom">
-          <div class="nav-item" onclick="openCatModal()">⚙ Manage Categories</div>
-          <div class="nav-item" onclick="openEditCo()">✎ Edit Company</div>
-          <div class="nav-item" onclick="openImport()">↑ Import CSV</div>
-          <div class="nav-item" onclick="exportBackup()">⬇ Export Backup</div>
-          <div class="nav-item" onclick="openRestoreModal()">⬆ Restore Backup</div>
-        </div>
-      </aside>
-      <div class="main">
-        <div class="topbar">
-          <div><span class="topbar-title">${titles[currentTab]}</span><span class="topbar-co">${company.name}</span></div>
-          <div class="topbar-actions">
-            <button class="btn btn-income btn-sm" onclick="openTxnModal('income')">+ Income</button>
-            <button class="btn btn-expense btn-sm" onclick="openTxnModal('expense')">+ Expense</button>
-          </div>
-        </div>
-        <div class="content" id="tab-content"></div>
+  document.getElementById('app').innerHTML=`<div class="app">
+    <aside class="sidebar">
+      <div class="logo-wrap"><div class="logo">1099 Books</div><div class="logo-sub">Business Finance</div></div>
+      <div class="co-wrap"><div class="co-label">Company</div>
+        <select class="co-select" onchange="selectCo(this.value)">${companies.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.name}</option>`).join('')}</select>
+        <button class="btn btn-ghost btn-sm btn-full" onclick="openAddCo()">+ Add Company</button>
       </div>
-      <nav class="bottom-nav">
-        ${navItems.map(n=>`<div class="bottom-nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')"><span class="bottom-nav-icon">${n.icon}</span><span>${n.label}</span></div>`).join('')}
-      </nav>
-    </div>`;
+      <div class="nav-wrap"><div class="nav-lbl">Navigate</div>
+        ${nav.map(n=>`<div class="nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')">${n.icon} ${n.label}</div>`).join('')}
+      </div>
+      <div class="sidebar-bottom">
+        <div class="nav-item" onclick="openCatModal()">&#x2699; Manage Categories</div>
+        <div class="nav-item" onclick="openEditCo()">&#x270E; Edit Company</div>
+        <div class="nav-item" onclick="openImport()">&#x2191; Import CSV</div>
+        <div class="user-chip"><div class="user-avatar">${currentUser?.email?.[0]?.toUpperCase()||'?'}</div><div style="flex:1;min-width:0;font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${currentUser?.email||''}</div><button onclick="signOut()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 5px;" title="Sign out">&#x21A5;</button></div>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="topbar"><div><span class="topbar-title">${titles[currentTab]}</span><span class="topbar-co">${c.name}</span></div>
+        <div class="topbar-actions"><button class="btn btn-income btn-sm" onclick="openTxnModal('income')">+ Income</button><button class="btn btn-expense btn-sm" onclick="openTxnModal('expense')">+ Expense</button></div>
+      </div>
+      <div class="content" id="tab-content"><div class="loading" style="min-height:200px;"><div class="spinner"></div></div></div>
+    </div>
+    <nav class="bottom-nav">${nav.map(n=>`<div class="bottom-nav-item${currentTab===n.id?' active':''}" onclick="switchTab('${n.id}')"><span class="bottom-nav-icon">${n.icon}</span><span>${n.label}</span></div>`).join('')}</nav>
+  </div>`;
   renderTab();
 }
-
-function renderTab(){
-  const el=document.getElementById('tab-content');
-  if(!el)return;
-  const company=co();
-  if(!company)return;
-  if(currentTab==='dashboard')el.innerHTML=renderDashboard(company);
-  else if(currentTab==='transactions')el.innerHTML=renderTransactions(company);
-  else if(currentTab==='pl')el.innerHTML=renderPL(company);
-  else if(currentTab==='taxes')el.innerHTML=renderTaxes(company);
+async function renderTab(){
+  const el=document.getElementById('tab-content');if(!el||!co())return;
+  const txns=await loadTxns(activeId);
+  if(currentTab==='dashboard')el.innerHTML=rDash(co(),txns);
+  else if(currentTab==='transactions')el.innerHTML=rTxns(co(),txns);
+  else if(currentTab==='pl')el.innerHTML=rPL(co(),txns);
+  else if(currentTab==='taxes')el.innerHTML=rTax(co(),txns);
 }
-
-// ─── Dashboard ────────────────────────────────────────────────────────────────
-function renderDashboard(c){
-  const txns=c.transactions||[];
-  const income=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const expenses=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const net=income-expenses, tax=Math.max(0,net*0.30);
+function rDash(c,txns){
+  const inc=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=inc-exp,tax=Math.max(0,net*0.30);
   const recent=[...txns].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
-  const catTotals={};
-  txns.filter(t=>t.type==='expense').forEach(t=>{catTotals[t.cat]=(catTotals[t.cat]||0)+t.amount;});
-  const catSorted=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
-  const maxCat=catSorted[0]?.[1]||1;
-  const connections=c.plaidConnections||[];
-
-  const installBanner=deferredInstall?`
-    <div class="install-banner">
-      <div><strong style="color:var(--text);display:block;margin-bottom:2px;">Install 1099 Books on your device</strong><span style="font-size:12px;color:var(--dim);">Add to home screen — works offline</span></div>
-      <button class="btn btn-primary btn-sm" onclick="installPWA()">Install App</button>
-    </div>`:'';
-
-  const bankSection=connections.length>0?`
-    <div class="bank-panel">
-      <div class="bank-panel-hdr">
-        <div>
-          <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);">Connected Banks</div>
-          ${c.lastSync?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">Last synced: ${c.lastSync}</div>`:''}
-        </div>
-        <button class="btn btn-blue btn-sm" onclick="syncBank()" ${syncingBank?'disabled':''}>
-          ${syncingBank?'<span class="spin">⟳</span> Syncing...':'↻ Sync Now'}
-        </button>
-      </div>
-      ${connections.map((conn,i)=>`
-        <div class="bank-acct-row">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🏦</span>
-            <div><div style="font-size:13px;">${conn.institutionName||'Bank'}</div><div style="font-size:11px;color:var(--muted);">${conn.accounts?.length||0} account(s)</div></div>
-          </div>
-          <button onclick="disconnectBank(${i})" class="btn btn-ghost btn-sm">Disconnect</button>
-        </div>`).join('')}
-      <button class="btn btn-blue btn-sm" style="margin-top:10px;width:100%;justify-content:center;" onclick="connectBank()">+ Connect Another Bank</button>
-    </div>`:`
-    <div class="bank-cta">
-      <div>
-        <div style="font-size:14px;font-weight:500;margin-bottom:3px;">Connect your bank to auto-import transactions</div>
-        <div style="font-size:12px;color:var(--muted);">Securely link via Plaid — transactions sync automatically</div>
-      </div>
-      <button class="btn btn-blue btn-sm" onclick="connectBank()">🏦 Connect Bank</button>
-    </div>`;
-
-  const recentRows=recent.length===0
-    ?`<tr><td colspan="5"><div class="empty">No transactions yet.<br>Connect a bank or add manually above.</div></td></tr>`
-    :recent.map(t=>`<tr>
-      <td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td>
-      <td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}</td>
-      <td><span class="cat-tag">${t.cat}</span></td>
-      <td><span class="type-badge type-${t.type}">${t.type}</span></td>
-      <td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td>
-    </tr>`).join('');
-
-  const breakdown=catSorted.length===0?'':`
-    <div class="sec-lbl">Expense Breakdown</div>
-    <div class="table-wrap" style="padding:18px 20px;">
-      ${catSorted.map(([cat,val])=>`
-        <div class="progress-wrap">
-          <div class="progress-header"><span style="color:var(--dim)">${cat}</span><span class="mono" style="color:var(--muted)">${fmt(val)}</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${(val/maxCat*100).toFixed(1)}%"></div></div>
-        </div>`).join('')}
-    </div>`;
-
-  return `${installBanner}${bankSection}
-    <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-label">Total Income</div><div class="kpi-value c-green">${fmt(income)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='income').length} transactions</div></div>
-      <div class="kpi-card"><div class="kpi-label">Total Expenses</div><div class="kpi-value c-red">${fmt(expenses)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='expense').length} transactions</div></div>
-      <div class="kpi-card"><div class="kpi-label">Net Profit</div><div class="kpi-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div><div class="kpi-sub">this year</div></div>
-      <div class="kpi-card"><div class="kpi-label">Est. Tax Owed</div><div class="kpi-value c-amber">${fmt(tax)}</div><div class="kpi-sub">~30% est. rate</div></div>
-    </div>
-    <div class="sec-lbl">Recent Transactions</div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th></tr></thead>
-      <tbody>${recentRows}</tbody></table>
-    </div>
-    ${breakdown}`;
-}
-
-// ─── Transactions ──────────────────────────────────────────────────────────────
-function renderTransactions(c){
-  const txns=c.transactions||[];
+  const catT={};txns.filter(t=>t.type==='expense').forEach(t=>{catT[t.cat]=(catT[t.cat]||0)+t.amount;});
+  const catS=Object.entries(catT).sort((a,b)=>b[1]-a[1]);const maxC=catS[0]?.[1]||1;
+  const conns=c.plaid_connections||[];
+  const bankS=conns.length>0?`<div class="bank-panel"><div class="bank-panel-hdr"><div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);">Connected Banks</div>${c.last_sync?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">Last synced: ${c.last_sync}</div>`:''}</div><button class="btn btn-blue btn-sm" onclick="syncAllBanks()" ${syncingBank?'disabled':''}>${syncingBank?'&#x27F3; Syncing...':'&#x21BB; Sync Now'}</button></div>${conns.map((cn,i)=>`<div class="bank-acct-row"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:18px;">&#x1F3E6;</span><div><div style="font-size:13px;">${cn.institutionName||'Bank'}</div><div style="font-size:11px;color:var(--muted);">${cn.accounts?.length||0} account(s)</div></div></div><button onclick="disconnectBank(${i})" class="btn btn-ghost btn-sm">Disconnect</button></div>`).join('')}<button class="btn btn-blue btn-sm" style="margin-top:10px;width:100%;justify-content:center;" onclick="connectBank()">+ Connect Another Bank</button></div>`:`<div class="bank-cta"><div><div style="font-size:14px;font-weight:500;margin-bottom:3px;">Connect your bank to auto-import transactions</div><div style="font-size:12px;color:var(--muted);">Securely link via Plaid</div></div><button class="btn btn-blue btn-sm" onclick="connectBank()">&#x1F3E6; Connect Bank</button></div>`;
+  const rows=recent.length===0?`<tr><td colspan="5"><div class="empty">No transactions yet. Connect a bank or add manually above.</div></td></tr>`:recent.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}</td><td><span class="cat-tag">${t.cat}</span></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td></tr>`).join('');
+  const bk=catS.length===0?'':`<div class="sec-lbl">Expense Breakdown</div><div class="table-wrap" style="padding:18px 20px;">${catS.map(([cat,val])=>`<div class="progress-wrap"><div class="progress-header"><span style="color:var(--dim)">${cat}</span><span class="mono" style="color:var(--muted)">${fmt(val)}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${(val/maxC*100).toFixed(1)}%"></div></div></div>`).join('')}</div>`;
+  return `${bankS}<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Total Income</div><div class="kpi-value c-green">${fmt(inc)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='income').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Total Expenses</div><div class="kpi-value c-red">${fmt(exp)}</div><div class="kpi-sub">${txns.filter(t=>t.type==='expense').length} transactions</div></div><div class="kpi-card"><div class="kpi-label">Net Profit</div><div class="kpi-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div><div class="kpi-sub">this year</div></div><div class="kpi-card"><div class="kpi-label">Est. Tax Owed</div><div class="kpi-value c-amber">${fmt(tax)}</div><div class="kpi-sub">~30% est. rate</div></div></div><div class="sec-lbl">Recent Transactions</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table></div>${bk}`;}
+function rTxns(c,txns){
   const cats=[...new Set(txns.map(t=>t.cat))].sort();
   const months=[...new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const filtered=txns.filter(t=>{
-    if(txnFilters.type&&t.type!==txnFilters.type)return false;
-    if(txnFilters.cat&&t.cat!==txnFilters.cat)return false;
-    if(txnFilters.month&&!t.date.startsWith(txnFilters.month))return false;
-    if(txnFilters.search&&!t.desc.toLowerCase().includes(txnFilters.search.toLowerCase())&&!t.cat.toLowerCase().includes(txnFilters.search.toLowerCase()))return false;
-    return true;
-  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
-
-  const rows=filtered.length===0
-    ?`<tr><td colspan="6"><div class="empty">No transactions found.</div></td></tr>`
-    :filtered.map(t=>`<tr>
-      <td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td>
-      <td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${t.notes}</div>`:''}</td>
-      <td><span class="cat-tag">${t.cat}</span></td>
-      <td><span class="type-badge type-${t.type}">${t.type}</span></td>
-      <td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td>
-      <td><button class="del-btn" onclick="deleteTxn('${t.id}')">✕</button></td>
-    </tr>`).join('');
-
-  return `
-    <div class="filter-bar">
-      <input type="text" placeholder="Search..." value="${txnFilters.search}" oninput="txnFilters.search=this.value;renderTab()">
-      <select onchange="txnFilters.type=this.value;renderTab()">
-        <option value=""${!txnFilters.type?' selected':''}>All types</option>
-        <option value="income"${txnFilters.type==='income'?' selected':''}>Income</option>
-        <option value="expense"${txnFilters.type==='expense'?' selected':''}>Expense</option>
-      </select>
-      <select onchange="txnFilters.cat=this.value;renderTab()">
-        <option value="">All categories</option>
-        ${cats.map(c=>`<option value="${c}"${txnFilters.cat===c?' selected':''}>${c}</option>`).join('')}
-      </select>
-      <select onchange="txnFilters.month=this.value;renderTab()">
-        <option value="">All months</option>
-        ${months.map(m=>`<option value="${m}"${txnFilters.month===m?' selected':''}>${m}</option>`).join('')}
-      </select>
-      ${(txnFilters.search||txnFilters.type||txnFilters.cat||txnFilters.month)?`<button class="btn btn-ghost btn-sm" onclick="txnFilters={search:'',type:'',cat:'',month:''};renderTab()">Clear</button>`:''}
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table>
-    </div>`;
-}
-
-// ─── P&L ──────────────────────────────────────────────────────────────────────
-function renderPL(c){
-  const txns=c.transactions||[];
+  const f=txns.filter(t=>{if(txnFilters.type&&t.type!==txnFilters.type)return false;if(txnFilters.cat&&t.cat!==txnFilters.cat)return false;if(txnFilters.month&&!t.date.startsWith(txnFilters.month))return false;if(txnFilters.search&&!t.desc.toLowerCase().includes(txnFilters.search.toLowerCase())&&!t.cat.toLowerCase().includes(txnFilters.search.toLowerCase()))return false;return true;});
+  const rows=f.length===0?`<tr><td colspan="6"><div class="empty">No transactions found.</div></td></tr>`:f.map(t=>`<tr><td class="mono" style="font-size:11px;color:var(--muted);">${t.date}</td><td>${t.plaidId?'<span class="bank-tag">BANK</span> ':''}${t.desc}${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${t.notes}</div>`:''}</td><td><select style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--dim);cursor:pointer;font-family:'Sora',sans-serif;outline:none;" onchange="changeTxnCat('${t.id}',this.value)">${(t.type==='income'?(c.income_cats||DEF_INC):(c.expense_cats||DEF_EXP)).map(opt=>`<option value="${opt}"${opt===t.cat?' selected':''}>${opt}</option>`).join('')}</select></td><td><span class="type-badge type-${t.type}">${t.type}</span></td><td class="r mono" style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td><td><button class="del-btn" onclick="delTxn('${t.id}')">&#x2715;</button></td></tr>`).join('');
+  return `<div class="filter-bar"><input type="text" placeholder="Search..." value="${txnFilters.search}" oninput="txnFilters.search=this.value;renderTab()"><select onchange="txnFilters.type=this.value;renderTab()"><option value=""${!txnFilters.type?' selected':''}>All types</option><option value="income"${txnFilters.type==='income'?' selected':''}>Income</option><option value="expense"${txnFilters.type==='expense'?' selected':''}>Expense</option></select><select onchange="txnFilters.cat=this.value;renderTab()"><option value="">All categories</option>${cats.map(c=>`<option value="${c}"${txnFilters.cat===c?' selected':''}>${c}</option>`).join('')}</select><select onchange="txnFilters.month=this.value;renderTab()"><option value="">All months</option>${months.map(m=>`<option value="${m}"${txnFilters.month===m?' selected':''}>${m}</option>`).join('')}</select>${(txnFilters.search||txnFilters.type||txnFilters.cat||txnFilters.month)?`<button class="btn btn-ghost btn-sm" onclick="txnFilters={search:'',type:'',cat:'',month:''};renderTab()">Clear</button>`:''}</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;}
+function rPL(c,txns){
   const months=[...new Set(txns.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const filtered=plMonth==='all'?txns:txns.filter(t=>t.date.startsWith(plMonth));
-  const incomes=filtered.filter(t=>t.type==='income'), expenses=filtered.filter(t=>t.type==='expense');
-  const incTotals={};incomes.forEach(t=>incTotals[t.cat]=(incTotals[t.cat]||0)+t.amount);
-  const expTotals={};expenses.forEach(t=>expTotals[t.cat]=(expTotals[t.cat]||0)+t.amount);
-  const totalInc=incomes.reduce((s,t)=>s+t.amount,0), totalExp=expenses.reduce((s,t)=>s+t.amount,0), net=totalInc-totalExp;
-  const plRow=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
-  return `
-    <div class="pl-months">
-      <button class="month-btn${plMonth==='all'?' active':''}" onclick="plMonth='all';renderTab()">All Time</button>
-      ${months.map(m=>`<button class="month-btn${plMonth===m?' active':''}" onclick="plMonth='${m}';renderTab()">${m}</button>`).join('')}
-    </div>
-    <div class="net-box"><div class="net-label">Net Profit / Loss</div><div class="net-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div></div>
-    <div class="pl-grid">
-      <div class="pl-card">
-        <div class="pl-card-hdr">Income</div>
-        ${Object.entries(incTotals).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No income recorded</div>':Object.entries(incTotals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>plRow(k,v,'var(--green)')).join('')}
-        <div class="pl-total"><span>Total Income</span><span class="mono c-green">${fmt(totalInc)}</span></div>
-      </div>
-      <div class="pl-card">
-        <div class="pl-card-hdr">Expenses</div>
-        ${Object.entries(expTotals).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No expenses recorded</div>':Object.entries(expTotals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>plRow(k,v,'var(--red)')).join('')}
-        <div class="pl-total"><span>Total Expenses</span><span class="mono c-red">${fmt(totalExp)}</span></div>
-      </div>
-    </div>`;
+  const f=plMonth==='all'?txns:txns.filter(t=>t.date.startsWith(plMonth));
+  const inc=f.filter(t=>t.type==='income'),exp=f.filter(t=>t.type==='expense');
+  const iT={};inc.forEach(t=>iT[t.cat]=(iT[t.cat]||0)+t.amount);
+  const eT={};exp.forEach(t=>eT[t.cat]=(eT[t.cat]||0)+t.amount);
+  const tI=inc.reduce((s,t)=>s+t.amount,0),tE=exp.reduce((s,t)=>s+t.amount,0),net=tI-tE;
+  const pr=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
+  return `<div class="pl-months"><button class="month-btn${plMonth==='all'?' active':''}" onclick="plMonth='all';renderTab()">All Time</button>${months.map(m=>`<button class="month-btn${plMonth===m?' active':''}" onclick="plMonth='${m}';renderTab()">${m}</button>`).join('')}</div><div class="net-box"><div class="net-label">Net Profit / Loss</div><div class="net-value ${net>=0?'c-green':'c-red'}">${fmt(net)}</div></div><div class="pl-grid"><div class="pl-card"><div class="pl-card-hdr">Income</div>${Object.entries(iT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No income recorded</div>':Object.entries(iT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--green)')).join('')}<div class="pl-total"><span>Total Income</span><span class="mono c-green">${fmt(tI)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Expenses</div>${Object.entries(eT).length===0?'<div style="padding:14px 18px;color:var(--muted);font-size:13px;">No expenses recorded</div>':Object.entries(eT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>pr(k,v,'var(--red)')).join('')}<div class="pl-total"><span>Total Expenses</span><span class="mono c-red">${fmt(tE)}</span></div></div></div>`;}
+function rTax(c,txns){
+  const inc=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=Math.max(0,inc-exp),se=net*0.153,fed=net*0.15,tot=se+fed;
+  const qI=[1,2,3,4].map(q=>{const r=[[1,3],[4,6],[7,9],[10,12]][q-1];return txns.filter(t=>{const m=parseInt(t.date.slice(5,7));return t.type==='income'&&m>=r[0]&&m<=r[1];}).reduce((s,t)=>s+t.amount,0);});
+  const rw=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
+  return `<div class="tax-hero"><div><div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:5px;">Estimated Tax Liability</div><div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--amber);">${fmt(tot)}</div><div style="font-size:11px;color:#A07820;margin-top:3px;">~30% self-employment effective rate</div></div><div style="text-align:right;"><div style="font-size:10px;color:#A07820;margin-bottom:4px;font-family:monospace;">Per Quarter</div><div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--amber);">${fmt(tot/4)}</div></div></div><div class="tax-grid"><div class="pl-card"><div class="pl-card-hdr">Tax Breakdown</div>${rw('Gross Income',inc,'var(--green)')}${rw('Deductible Expenses',exp,'var(--red)')}${rw('Net Taxable Income',net)}${rw('SE Tax (15.3%)',se)}${rw('Federal Tax (15%)',fed)}<div class="pl-total"><span>Total Estimated</span><span class="mono c-amber">${fmt(tot)}</span></div></div><div class="pl-card"><div class="pl-card-hdr">Quarterly Schedule</div>${[['Q1 (Jan-Mar)','Apr 15',0],['Q2 (Apr-Jun)','Jun 15',1],['Q3 (Jul-Sep)','Sep 15',2],['Q4 (Oct-Dec)','Jan 15',3]].map(([l,d,i])=>`<div class="pl-row" style="align-items:center;"><div><div style="color:var(--dim);">${l}</div><div style="font-size:11px;color:var(--muted);">Due ${d}</div></div><span class="mono c-amber">${fmt(qI[i]*0.30)}</span></div>`).join('')}</div></div><div class="pl-card"><div class="pl-card-hdr">Common 1099 Deductible Expenses</div>${[['&#x1F3E2;','401k Contributions','Up to $23k/yr employee'],['&#x1F4CA;','Accounting Fees','CPA, bookkeeping, tax prep'],['&#x1F4CB;','Licensing','Medical, state, DEA licenses'],['&#x1F37D;','Meals','50% deductible for business meals'],['&#x1F4BC;','Payroll - Employer Taxes','FICA, FUTA, SUTA'],['&#x1F4B0;','Payroll - Salary & Wages','Employees & contractors'],['&#x1F3E0;','Home Office','Dedicated workspace sq footage'],['&#x1F697;','Vehicle (Fuel)','67c/mile standard 2024'],['&#x1F527;','Vehicle (Repairs & Maint.)','Actual expense method'],['&#x1F3E5;','Health Insurance','100% deductible self-employed']].map(([i,n,d])=>`<div class="pl-row"><span style="color:var(--dim);">${i} ${n}</span><span style="color:var(--muted);font-size:11px;">${d}</span></div>`).join('')}</div>`;}
+async function changeTxnCat(id,newCat){
+  await sb.from('transactions').update({category:newCat}).eq('id',id);
+  toast('Category updated');
 }
 
-// ─── Taxes ────────────────────────────────────────────────────────────────────
-function renderTaxes(c){
-  const txns=c.transactions||[];
-  const income=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const expenses=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const net=Math.max(0,income-expenses), seTax=net*0.153, fedTax=net*0.15, total=seTax+fedTax;
-  const qIncome=[1,2,3,4].map(q=>{const r=[[1,3],[4,6],[7,9],[10,12]][q-1];return txns.filter(t=>{const m=parseInt(t.date.slice(5,7));return t.type==='income'&&m>=r[0]&&m<=r[1];}).reduce((s,t)=>s+t.amount,0);});
-  const row=(l,v,col)=>`<div class="pl-row"><span style="color:var(--dim)">${l}</span><span class="mono" style="color:${col||'var(--text)'}">${fmt(v)}</span></div>`;
-  return `
-    <div class="tax-hero">
-      <div>
-        <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:5px;">Estimated Tax Liability</div>
-        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--amber);">${fmt(total)}</div>
-        <div style="font-size:11px;color:#A07820;margin-top:3px;">Based on ~30% self-employment effective rate</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:10px;color:#A07820;margin-bottom:4px;font-family:monospace;">Per Quarter</div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--amber);">${fmt(total/4)}</div>
-      </div>
-    </div>
-    <div class="tax-grid">
-      <div class="pl-card">
-        <div class="pl-card-hdr">Tax Breakdown</div>
-        ${row('Gross Income',income,'var(--green)')}${row('Deductible Expenses',expenses,'var(--red)')}${row('Net Taxable Income',net)}${row('SE Tax (15.3%)',seTax)}${row('Federal Tax (15%)',fedTax)}
-        <div class="pl-total"><span>Total Estimated</span><span class="mono c-amber">${fmt(total)}</span></div>
-      </div>
-      <div class="pl-card">
-        <div class="pl-card-hdr">Quarterly Schedule</div>
-        ${[['Q1 (Jan–Mar)','Apr 15',0],['Q2 (Apr–Jun)','Jun 15',1],['Q3 (Jul–Sep)','Sep 15',2],['Q4 (Oct–Dec)','Jan 15',3]].map(([l,d,i])=>`
-          <div class="pl-row" style="align-items:center;">
-            <div><div style="color:var(--dim);">${l}</div><div style="font-size:11px;color:var(--muted);">Due ${d}</div></div>
-            <span class="mono c-amber">${fmt(qIncome[i]*0.30)}</span>
-          </div>`).join('')}
-      </div>
-    </div>
-    <div class="pl-card">
-      <div class="pl-card-hdr">Common 1099 Deductible Expenses</div>
-      ${[['🏢','401k Contributions','Up to $23k/yr employee; $69k total'],['📊','Accounting Fees','CPA, bookkeeping, tax prep'],['📋','Licensing','Medical, state, DEA licenses'],['🍽️','Meals','50% deductible for business meals'],['💼','Payroll - Employer Taxes','FICA, FUTA, SUTA'],['💰','Payroll - Salary & Wages','Employees & contractors'],['🏠','Home Office','Dedicated workspace sq footage'],['🚗','Vehicle (Fuel)','Keep mileage log; 67¢/mile standard'],['🔧','Vehicle (Repairs & Maint.)','Actual expense method'],['🏥','Health Insurance','100% deductible self-employed']].map(([i,n,d])=>`
-        <div class="pl-row"><span style="color:var(--dim);">${i} ${n}</span><span style="color:var(--muted);font-size:11px;">${d}</span></div>`).join('')}
-    </div>`;
-}
-
-// ─── Company Actions ──────────────────────────────────────────────────────────
-function switchTab(t){currentTab=t;render();}
-function selectCo(id){state.activeId=id;save();currentTab='dashboard';txnFilters={search:'',type:'',cat:'',month:''};render();}
+function switchTab(t){currentTab=t;renderAppShell();}
+function selectCo(id){activeId=id;currentTab='dashboard';txnFilters={search:'',type:'',cat:'',month:''};render();}
 function openAddCo(){document.getElementById('new-co-name').value='';openModal('add-co-overlay');setTimeout(()=>document.getElementById('new-co-name').focus(),100);}
-function addCompany(){
-  const name=document.getElementById('new-co-name').value.trim();
-  if(!name)return;
-  const nc={id:uid(),name,transactions:[],incomeCats:[...DEF_INC],expenseCats:[...DEF_EXP],plaidConnections:[]};
-  state.companies.push(nc);state.activeId=nc.id;save();closeModal('add-co-overlay');currentTab='dashboard';render();
+async function addCompany(){
+  const name=document.getElementById('new-co-name').value.trim();if(!name)return;
+  const nc={id:uid(),name,income_cats:DEF_INC,expense_cats:DEF_EXP,plaid_connections:[],user_id:currentUser.id};
+  const saved=await saveCo(nc);if(saved){companies.push(saved);activeId=saved.id;}
+  closeModal('add-co-overlay');currentTab='dashboard';render();
 }
 function openEditCo(){document.getElementById('edit-co-name').value=co().name;openModal('edit-co-overlay');}
-function saveEditCompany(){
-  const name=document.getElementById('edit-co-name').value.trim();
-  if(!name)return;
-  updateCo(c=>({...c,name}));closeModal('edit-co-overlay');render();
+async function saveEditCompany(){
+  const name=document.getElementById('edit-co-name').value.trim();if(!name)return;
+  companies=companies.map(c=>c.id===activeId?{...c,name}:c);await saveCo(co());closeModal('edit-co-overlay');render();
 }
-function confirmDeleteCompany(){
-  document.getElementById('del-co-msg').textContent=`Are you sure you want to delete "${co().name}"? All ${co().transactions?.length||0} transactions will be permanently removed.`;
-  closeModal('edit-co-overlay');openModal('del-co-overlay');
-}
-function deleteCompany(){
-  state.companies=state.companies.filter(c=>c.id!==state.activeId);
-  state.activeId=state.companies[0]?.id||null;
-  save();closeModal('del-co-overlay');render();
-}
-
-// ─── Transaction Actions ──────────────────────────────────────────────────────
+function confirmDeleteCompany(){document.getElementById('del-co-msg').textContent=`Are you sure you want to delete "${co().name}"? All transactions will be permanently removed.`;closeModal('edit-co-overlay');openModal('del-co-overlay');}
+async function deleteCompany(){await delCoDB(activeId);companies=companies.filter(c=>c.id!==activeId);activeId=companies[0]?.id||null;closeModal('del-co-overlay');render();}
 function openTxnModal(type){
-  const company=co();
+  const c=co();
   document.getElementById('txn-type').value=type;
   document.getElementById('txn-modal-title').textContent=type==='income'?'Add Income':'Add Expense';
   document.getElementById('txn-date').value=today();
   document.getElementById('txn-amount').value='';
   document.getElementById('txn-desc').value='';
   document.getElementById('txn-notes').value='';
-  const cats=type==='income'?(company.incomeCats||DEF_INC):(company.expenseCats||DEF_EXP);
+  const cats=type==='income'?(c.income_cats||DEF_INC):(c.expense_cats||DEF_EXP);
   document.getElementById('txn-cat').innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-  openModal('txn-overlay');
-  setTimeout(()=>document.getElementById('txn-amount').focus(),100);
+  openModal('txn-overlay');setTimeout(()=>document.getElementById('txn-amount').focus(),100);
 }
-function saveTxn(){
+async function saveTxn(){
   const type=document.getElementById('txn-type').value;
   const date=document.getElementById('txn-date').value;
   const amount=parseFloat(document.getElementById('txn-amount').value);
@@ -858,57 +434,22 @@ function saveTxn(){
   const cat=document.getElementById('txn-cat').value;
   const notes=document.getElementById('txn-notes').value.trim();
   if(!date||isNaN(amount)||amount<=0||!desc){toast('Please fill in date, amount, and description','error');return;}
-  updateCo(c=>({...c,transactions:[...(c.transactions||[]),{id:uid(),type,date,amount,desc,cat,notes}]}));
+  await saveTxnDB({id:uid(),type,date,amount,desc,cat,notes,plaidId:null},activeId);
   closeModal('txn-overlay');renderTab();
 }
-function deleteTxn(id){updateCo(c=>({...c,transactions:(c.transactions||[]).filter(t=>t.id!==id)}));renderTab();}
-
-// ─── Category Manager ─────────────────────────────────────────────────────────
+async function delTxn(id){await delTxnDB(id);renderTab();}
 function openCatModal(){
-  const company=co();
-  catEditing={income:[...(company.incomeCats||DEF_INC)],expense:[...(company.expenseCats||DEF_EXP)]};
-  catTab='expense';
-  document.getElementById('cat-tab-expense').classList.add('active');
-  document.getElementById('cat-tab-income').classList.remove('active');
-  document.getElementById('new-cat-input').value='';
-  renderCatList();openModal('cat-overlay');
+  const c=co();catEditing={income:[...(c.income_cats||DEF_INC)],expense:[...(c.expense_cats||DEF_EXP)]};
+  catTab='expense';document.getElementById('cat-tab-expense').classList.add('active');document.getElementById('cat-tab-income').classList.remove('active');
+  document.getElementById('new-cat-input').value='';renderCatList();openModal('cat-overlay');
 }
-function switchCatTab(tab){
-  catTab=tab;
-  document.getElementById('cat-tab-expense').classList.toggle('active',tab==='expense');
-  document.getElementById('cat-tab-income').classList.toggle('active',tab==='income');
-  document.getElementById('new-cat-input').value='';
-  renderCatList();
-}
-function renderCatList(){
-  const cats=catEditing[catTab];
-  const el=document.getElementById('cat-list');
-  if(!el)return;
-  el.innerHTML=cats.length===0
-    ?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px;">No categories yet.</div>'
-    :cats.map((c,i)=>`<div class="cat-item" id="ci-${i}"><span class="cat-name">${c}</span><button class="icon-btn" onclick="startCatEdit(${i})">✎</button><button class="icon-btn" onclick="deleteCat(${i})">✕</button></div>`).join('');
-}
-function addCat(){
-  const val=document.getElementById('new-cat-input').value.trim();
-  if(!val||catEditing[catTab].includes(val))return;
-  catEditing[catTab]=[...catEditing[catTab],val].sort();
-  document.getElementById('new-cat-input').value='';renderCatList();
-}
+function switchCatTab(tab){catTab=tab;document.getElementById('cat-tab-expense').classList.toggle('active',tab==='expense');document.getElementById('cat-tab-income').classList.toggle('active',tab==='income');document.getElementById('new-cat-input').value='';renderCatList();}
+function renderCatList(){const cats=catEditing[catTab];const el=document.getElementById('cat-list');if(!el)return;el.innerHTML=cats.length===0?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px;">No categories yet.</div>':cats.map((c,i)=>`<div class="cat-item" id="ci-${i}"><span class="cat-name">${c}</span><button class="icon-btn" onclick="startCatEdit(${i})">&#x270E;</button><button class="icon-btn" onclick="deleteCat(${i})">&#x2715;</button></div>`).join('');}
+function addCat(){const val=document.getElementById('new-cat-input').value.trim();if(!val||catEditing[catTab].includes(val))return;catEditing[catTab]=[...catEditing[catTab],val].sort();document.getElementById('new-cat-input').value='';renderCatList();}
 function deleteCat(i){catEditing[catTab]=catEditing[catTab].filter((_,idx)=>idx!==i);renderCatList();}
-function startCatEdit(i){
-  const item=document.getElementById(`ci-${i}`);
-  const name=catEditing[catTab][i];
-  item.innerHTML=`<input class="cat-edit-input" id="ce-${i}" value="${name}" onkeydown="if(event.key==='Enter')saveCatEdit(${i});if(event.key==='Escape')renderCatList();"><button class="icon-btn" onclick="saveCatEdit(${i})">✓</button><button class="icon-btn" onclick="renderCatList()">✕</button>`;
-  setTimeout(()=>document.getElementById(`ce-${i}`)?.focus(),50);
-}
-function saveCatEdit(i){
-  const val=document.getElementById(`ce-${i}`)?.value.trim();
-  if(!val)return;
-  catEditing[catTab][i]=val;catEditing[catTab].sort();renderCatList();
-}
-function saveCats(){updateCo(c=>({...c,incomeCats:catEditing.income,expenseCats:catEditing.expense}));closeModal('cat-overlay');toast('Categories saved');}
-
-// ─── CSV Import ───────────────────────────────────────────────────────────────
+function startCatEdit(i){const item=document.getElementById(`ci-${i}`);const name=catEditing[catTab][i];item.innerHTML=`<input class="cat-edit-input" id="ce-${i}" value="${name}" onkeydown="if(event.key==='Enter')saveCatEdit(${i});if(event.key==='Escape')renderCatList();"><button class="icon-btn" onclick="saveCatEdit(${i})">&#x2713;</button><button class="icon-btn" onclick="renderCatList()">&#x2715;</button>`;setTimeout(()=>document.getElementById(`ce-${i}`)?.focus(),50);}
+function saveCatEdit(i){const val=document.getElementById(`ce-${i}`)?.value.trim();if(!val)return;catEditing[catTab][i]=val;catEditing[catTab].sort();renderCatList();}
+async function saveCats(){companies=companies.map(c=>c.id===activeId?{...c,income_cats:catEditing.income,expense_cats:catEditing.expense}:c);await saveCo(co());closeModal('cat-overlay');toast('Categories saved');}
 function openImport(){pendingCSV=[];document.getElementById('csv-preview').innerHTML='';document.getElementById('import-confirm-btn').style.display='none';document.getElementById('csv-file').value='';openModal('import-overlay');}
 function handleCSV(e){
   const file=e.target.files[0];if(!file)return;
@@ -921,86 +462,29 @@ function handleCSV(e){
       const cols=lines[i].split(',').map(c=>c.trim().replace(/^["']|["']$/g,''));
       const row={};headers.forEach((h,idx)=>row[h]=cols[idx]||'');
       const raw=parseFloat((row.amount||row.debit||row.credit||'0').replace(/[$,]/g,''));
-      const amount=Math.abs(raw);
-      const type=row.type?row.type.toLowerCase():(raw>=0?'income':'expense');
-      const desc=row.description||row.memo||row.name||'';
-      const date=row.date||row['transaction date']||today();
+      const amount=Math.abs(raw);const type=row.type?row.type.toLowerCase():(raw>=0?'income':'expense');
+      const desc=row.description||row.memo||row.name||'';const date=row.date||row['transaction date']||today();
       const cat=row.category||(type==='income'?'Other Income':'Other Expenses');
-      if(!isNaN(amount)&&amount>0&&desc)pendingCSV.push({id:uid(),type,date,amount,desc,cat,notes:''});
+      if(!isNaN(amount)&&amount>0&&desc)pendingCSV.push({id:uid(),type,date,amount,desc,cat,notes:'',plaidId:null});
     }
     const preview=document.getElementById('csv-preview');
     if(pendingCSV.length===0){preview.innerHTML='<p style="color:var(--red);font-size:13px;">No valid rows found.</p>';return;}
-    preview.innerHTML=`<p style="color:var(--green);font-size:13px;margin-bottom:10px;">✓ Found ${pendingCSV.length} transactions ready to import.</p>`+
-      pendingCSV.slice(0,4).map(t=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--dim);">${t.date} — ${t.desc.slice(0,38)}</span><span style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</span></div>`).join('')+
-      (pendingCSV.length>4?`<div style="font-size:11px;color:var(--muted);padding-top:7px;">...and ${pendingCSV.length-4} more</div>`:'');
+    preview.innerHTML=`<p style="color:var(--green);font-size:13px;margin-bottom:10px;">&#x2713; Found ${pendingCSV.length} transactions ready to import.</p>`+pendingCSV.slice(0,4).map(t=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--dim);">${t.date} - ${t.desc.slice(0,38)}</span><span style="color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</span></div>`).join('')+(pendingCSV.length>4?`<div style="font-size:11px;color:var(--muted);padding-top:7px;">...and ${pendingCSV.length-4} more</div>`:'');
     document.getElementById('import-confirm-btn').style.display='inline-flex';
-  };
-  reader.readAsText(file);
+  };reader.readAsText(file);
 }
-function confirmImport(){updateCo(c=>({...c,transactions:[...(c.transactions||[]),...pendingCSV]}));closeModal('import-overlay');toast(`✓ Imported ${pendingCSV.length} transactions`);renderTab();}
-
-// ─── PWA Install ──────────────────────────────────────────────────────────────
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;render();});
-function installPWA(){
-  if(!deferredInstall)return;
-  deferredInstall.prompt();
-  deferredInstall.userChoice.then(r=>{if(r.outcome==='accepted'){deferredInstall=null;toast('✓ App installed!');render();}});
+async function confirmImport(){for(const t of pendingCSV)await saveTxnDB(t,activeId);closeModal('import-overlay');toast(`Imported ${pendingCSV.length} transactions`);renderTab();}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+async function boot(){
+  document.getElementById('app').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){currentUser=session.user;await initApp();}else renderAuth();
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session){currentUser=session.user;await initApp();}
+    else if(event==='SIGNED_OUT'){currentUser=null;companies=[];activeId=null;renderAuth();}
+  });
 }
-window.addEventListener('appinstalled',()=>{deferredInstall=null;render();});
-
-// ─── Service Worker ───────────────────────────────────────────────────────────
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
-
-// ─── Export / Restore Backup ──────────────────────────────────────────────────
-function exportBackup(){
-  const data = JSON.stringify(state, null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '1099books-backup-' + today() + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('✓ Backup downloaded!');
-}
-
-function openRestoreModal(){
-  document.getElementById('restore-preview').innerHTML = '';
-  document.getElementById('restore-confirm-btn').style.display = 'none';
-  document.getElementById('restore-file').value = '';
-  openModal('restore-overlay');
-}
-
-function handleRestoreFile(e){
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const parsed = JSON.parse(ev.target.result);
-      if(!parsed.companies) throw new Error('Invalid backup file');
-      const preview = document.getElementById('restore-preview');
-      preview.innerHTML = `<div style="background:var(--green-bg);border:1px solid var(--green-bd);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--green);">
-        ✓ Valid backup found<br>
-        <span style="font-size:11px;color:var(--muted);margin-top:4px;display:block;">${parsed.companies.length} companies · ${parsed.companies.reduce((s,c)=>s+(c.transactions?.length||0),0)} total transactions</span>
-      </div>
-      <p style="color:var(--red);font-size:12px;margin-top:10px;">⚠ This will replace all current data on this device.</p>`;
-      document.getElementById('restore-confirm-btn').style.display = 'inline-flex';
-      document.getElementById('restore-confirm-btn').onclick = () => {
-        state = parsed;
-        save();
-        closeModal('restore-overlay');
-        toast('✓ Backup restored!');
-        render();
-      };
-    } catch(e) {
-      document.getElementById('restore-preview').innerHTML = `<p style="color:var(--red);font-size:13px;">Invalid backup file. Please use a file exported from 1099 Books.</p>`;
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-load();render();
+boot();
 </script>
 </body>
 </html>
